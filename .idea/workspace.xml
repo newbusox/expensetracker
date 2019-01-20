@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="11ae4a8a-e1c7-4e89-a5de-9a9034b995b1" name="Default" comment="" />
+    <list default="true" id="11ae4a8a-e1c7-4e89-a5de-9a9034b995b1" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/expenses/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/expenses/views.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,6 +16,18 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/expensetracker/settings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="56">
+              <caret line="111" lean-forward="true" selection-start-line="111" selection-end-line="111" />
+              <folding>
+                <element signature="e#315#324#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/expenses/models.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -44,11 +58,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="views.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/expenses/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="82" column="35" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
+            <state relative-caret-position="434">
+              <caret line="53" column="58" selection-start-line="53" selection-start-column="58" selection-end-line="53" selection-end-column="58" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -68,14 +82,14 @@
       <file leaf-file-name="project_detail.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/expenses/templates/project_detail.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
+            <state relative-caret-position="604">
               <caret line="56" column="17" selection-start-line="56" selection-start-column="17" selection-end-line="56" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Procfile" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/expenses/templates/Procfile">
+      <file leaf-file-name="Procfile" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Procfile">
           <provider selected="true" editor-type-id="text-editor">
             <state>
               <caret column="33" lean-forward="true" selection-start-column="33" selection-end-column="33" />
@@ -88,18 +102,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="415">
               <caret line="43" column="7" selection-start-line="43" selection-start-column="7" selection-end-line="43" selection-end-column="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="admin.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/expenses/admin.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="37" selection-start-line="10" selection-start-column="37" selection-end-line="10" selection-end-column="37" />
-              <folding>
-                <element signature="e#0#32#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -139,17 +141,17 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/expensetracker/settings.py" />
         <option value="$PROJECT_DIR$/expenses/migrations/0003_workday_date.py" />
         <option value="$PROJECT_DIR$/expenses/.gitignore" />
         <option value="$PROJECT_DIR$/expenses/templates/index.html" />
         <option value="$PROJECT_DIR$/expenses/admin.py" />
         <option value="$PROJECT_DIR$/expensetracker/urls.py" />
         <option value="$PROJECT_DIR$/expenses/models.py" />
-        <option value="$PROJECT_DIR$/expenses/views.py" />
         <option value="$PROJECT_DIR$/expenses/templates/workday_detail.html" />
         <option value="$PROJECT_DIR$/expenses/templates/project_detail.html" />
         <option value="$PROJECT_DIR$/expenses/templates/Procfile" />
+        <option value="$PROJECT_DIR$/expensetracker/settings.py" />
+        <option value="$PROJECT_DIR$/expenses/views.py" />
       </list>
     </option>
   </component>
@@ -184,6 +186,12 @@
               <item name="expensetracker" type="b2602c69:ProjectViewProjectNode" />
               <item name="expensetracker" type="462c0819:PsiDirectoryNode" />
               <item name="expenses" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="expensetracker" type="b2602c69:ProjectViewProjectNode" />
+              <item name="expensetracker" type="462c0819:PsiDirectoryNode" />
+              <item name="expenses" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="expensetracker" type="b2602c69:ProjectViewProjectNode" />
@@ -271,7 +279,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.4070138" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32943678" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32943678" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32518598" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15677084" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
@@ -318,6 +326,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2261">
           <caret line="133" column="17" lean-forward="true" selection-start-line="133" selection-start-column="17" selection-end-line="133" selection-end-column="17" />
+          <folding>
+            <element signature="e#315#324#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -368,13 +379,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/expensetracker/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="663">
-          <caret line="39" column="15" selection-start-line="39" selection-start-column="15" selection-end-line="39" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/expenses/templates/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -422,16 +426,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/expenses/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="82" column="35" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/expenses/templates/index.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="362">
@@ -446,17 +440,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/expensetracker/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="56">
+          <caret line="111" lean-forward="true" selection-start-line="111" selection-end-line="111" />
+          <folding>
+            <element signature="e#315#324#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Procfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="33" lean-forward="true" selection-start-column="33" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/expenses/templates/project_detail.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state relative-caret-position="604">
           <caret line="56" column="17" selection-start-line="56" selection-start-column="17" selection-end-line="56" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/expenses/templates/Procfile">
+    <entry file="file://$PROJECT_DIR$/expenses/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="33" lean-forward="true" selection-start-column="33" selection-end-column="33" />
+        <state relative-caret-position="434">
+          <caret line="53" column="58" selection-start-line="53" selection-start-column="58" selection-end-line="53" selection-end-column="58" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

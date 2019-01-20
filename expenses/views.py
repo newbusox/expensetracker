@@ -47,14 +47,11 @@ def index(request):
 def geocode(address):
     # google maps client set up
     google_maps_api_key = 'AIzaSyDCd2Zzq_FCPUagE4Plp-mNbvIJEJgY9Dg'
-    #gmaps = googlemaps.Client(key=google_maps_api_key)
-    #geocode_result = gmaps.geocode(address)
+    gmaps = googlemaps.Client(key=google_maps_api_key)
+    geocode_result = gmaps.geocode(address)
 
-    #lat = geocode_result[0]['geometry']['location']['lat']
-    #lng = geocode_result[0]['geometry']['location']['lng']
-
-    lat = 0
-    lng = 0
+    lat = geocode_result[0]['geometry']['location']['lat']
+    lng = geocode_result[0]['geometry']['location']['lng']
 
     return lat, lng
 
