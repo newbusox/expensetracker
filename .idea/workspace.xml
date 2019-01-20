@@ -1,25 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="11ae4a8a-e1c7-4e89-a5de-9a9034b995b1" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0006_workday_employee.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0007_employee_base_salary.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0008_auto_20190119_2353.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0009_employee_slug.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0010_auto_20190120_0038.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0011_auto_20190120_0044.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0012_workday_slug.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/migrations/0013_auto_20190120_0142.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/templates/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/templates/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/templates/project_detail.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/expenses/templates/workday_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expenses/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/expenses/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expenses/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/expenses/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expenses/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/expenses/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expensetracker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/expensetracker/urls.py" afterDir="false" />
-    </list>
+    <list default="true" id="11ae4a8a-e1c7-4e89-a5de-9a9034b995b1" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -83,20 +65,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="project_detail.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="project_detail.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/expenses/templates/project_detail.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="262">
-              <caret line="70" column="157" lean-forward="true" selection-start-line="70" selection-start-column="157" selection-end-line="70" selection-end-column="157" />
+            <state relative-caret-position="328">
+              <caret line="70" column="158" selection-start-line="70" selection-start-column="158" selection-end-line="70" selection-end-column="158" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="workday_detail.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="workday_detail.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/expenses/templates/workday_detail.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="38" column="79" lean-forward="true" selection-start-line="38" selection-start-column="79" selection-end-line="38" selection-end-column="79" />
+            <state relative-caret-position="415">
+              <caret line="43" column="7" lean-forward="true" selection-start-line="43" selection-start-column="7" selection-end-line="43" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -161,8 +143,8 @@
         <option value="$PROJECT_DIR$/expensetracker/urls.py" />
         <option value="$PROJECT_DIR$/expenses/models.py" />
         <option value="$PROJECT_DIR$/expenses/views.py" />
-        <option value="$PROJECT_DIR$/expenses/templates/project_detail.html" />
         <option value="$PROJECT_DIR$/expenses/templates/workday_detail.html" />
+        <option value="$PROJECT_DIR$/expenses/templates/project_detail.html" />
       </list>
     </option>
   </component>
@@ -197,12 +179,6 @@
               <item name="expensetracker" type="b2602c69:ProjectViewProjectNode" />
               <item name="expensetracker" type="462c0819:PsiDirectoryNode" />
               <item name="expenses" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="expensetracker" type="b2602c69:ProjectViewProjectNode" />
-              <item name="expensetracker" type="462c0819:PsiDirectoryNode" />
-              <item name="expenses" type="462c0819:PsiDirectoryNode" />
-              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="expensetracker" type="b2602c69:ProjectViewProjectNode" />
@@ -281,7 +257,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="manage.py@expensetracker" order="7" weight="0.32943678" />
@@ -290,14 +265,14 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.4070138" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32943678" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32943678" />
+      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32943678" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.15677084" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="right" id="SciView" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.3995749" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3995749" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -458,17 +433,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/expenses/templates/project_detail.html">
+    <entry file="file://$PROJECT_DIR$/expenses/templates/workday_detail.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="70" column="157" lean-forward="true" selection-start-line="70" selection-start-column="157" selection-end-line="70" selection-end-column="157" />
+        <state relative-caret-position="415">
+          <caret line="43" column="7" lean-forward="true" selection-start-line="43" selection-start-column="7" selection-end-line="43" selection-end-column="7" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/expenses/templates/workday_detail.html">
+    <entry file="file://$PROJECT_DIR$/expenses/templates/project_detail.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="38" column="79" lean-forward="true" selection-start-line="38" selection-start-column="79" selection-end-line="38" selection-end-column="79" />
+        <state relative-caret-position="328">
+          <caret line="70" column="158" selection-start-line="70" selection-start-column="158" selection-end-line="70" selection-end-column="158" />
         </state>
       </provider>
     </entry>
