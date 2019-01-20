@@ -1,5 +1,18 @@
+import googlemaps
 from django.db import models
 from django.template.defaultfilters import slugify
+
+
+def geocode(address):
+    # google maps client set up
+    google_maps_api_key = 'AIzaSyDCd2Zzq_FCPUagE4Plp-mNbvIJEJgY9Dg'
+    gmaps = googlemaps.Client(key=google_maps_api_key)
+    geocode_result = gmaps.geocode(address)
+
+    lat = geocode_result[0]['geometry']['location']['lat']
+    lng = geocode_result[0]['geometry']['location']['lng']
+
+    return lat, lng
 
 
 class Client(models.Model):
@@ -12,7 +25,14 @@ class Project(models.Model):
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=400)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(unique=True)
+    lat = models.FloatField(blank=True, null=True)
+    lng = models.FloatField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.lat == 0:
+            self.lat, self.lng = geocode(self.address)
+        super(Project, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.address
@@ -20,6 +40,8 @@ class Project(models.Model):
 class Employee(models.Model):
     name = models.CharField(max_length=200)
     base_salary = models.IntegerField(blank=True, null=True)
+
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return self.name
@@ -37,7 +59,7 @@ class WorkDay(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     employee = models.ManyToManyField(Employee, blank=True)
     employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
         try:

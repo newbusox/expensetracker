@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html>
+    <head lang="en">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -25,20 +25,53 @@
     <!-- Latest compiled and minified Locales -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-en-US.min.js"></script>
 
+    <script>
+        $(function () {
+            var $table = $('#table');
+            var $search = $table.data('bootstrap.table')
+                .$toolbar.find('.search input');
+            $search.attr('placeholder', 'Search');
+            $('.search').toggleClass('pull-right').toggleClass('pull-left');
+        });
 
-    <meta charset="UTF-8">
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_3CNnV9Acvy2WAktrXOLvH6PU7Vt2MZo&callback=initMap">
+    </script>
+    <script>
+        function initMap() {
+            var uluru = {lat: {{ project.lat }}, lng: {{ project.lng }} };
 
+            var street_view = new google.maps.StreetViewPanorama(document.getElementById('street_view'), {
+                position: uluru,
+        });
+
+      }
+    </script>
+    <style>
+        .table-responsive{
+            overflow-y: hidden;
+        }
+    </style>
+    <style>
+        #street_view {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-{% if workday %}
-    <h1>{{ workday.date }}</h1><a href="{% url 'admin:expenses_workday_change' workday.id %}">Edit Work Day</a>
-    <h2>{{ workday.project }}</h2>
-    <h3>Description</h3>
-    {{ workday.description|linebreaks }}
-    <h3>Laborers</h3>
-    {% for employee in workday.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
-    <h3>Daily Total Labor Cost</h3>
-    {% if daily_spend %}{{ daily_spend }}{% endif %}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% if employee %}
+    <h3>Projects</h3>
+    {%  for project in projects %}
+        <h4>{{ project.address }}</h4>
+    {% for workday in project.work_days %}
+        <div><a href="{%url 'workday_detail' slug=workday.slug %}">{{  workday.date }}</a></div>
+    {% endfor %}
+        <div>{{ project.employee_labor_spend }}</div>
+    {% endfor %}
+    <h4>Total Labor Spend {{ total_labor_spend }}</h4>
+
 {% endif %}
 </body>
-</html>

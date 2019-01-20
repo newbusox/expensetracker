@@ -24,4 +24,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     url(r'^day/(?P<slug>[-\w\d\_]+)/$', views.workday_detail, name='workday_detail'),
     url(r'^project/(?P<slug>[-\w\d\_]+)/$', views.project_detail, name='project_detail'),
+    url(r'^employee/(?P<slug>[-\w\d\_]+)/$', views.employee_detail, name='employee_detail'),
 ]

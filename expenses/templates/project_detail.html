@@ -68,7 +68,7 @@
         {% if days_worked %}
         {% for day in days_worked %}
             <div>
-                <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in day.employee.all %}{{ employee.name }}, {% endfor %})
+                <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
             </div>
         {% endfor %}
         {% endif %}

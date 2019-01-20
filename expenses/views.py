@@ -44,22 +44,11 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
-def geocode(address):
-    # google maps client set up
-    google_maps_api_key = 'AIzaSyDCd2Zzq_FCPUagE4Plp-mNbvIJEJgY9Dg'
-    gmaps = googlemaps.Client(key=google_maps_api_key)
-    geocode_result = gmaps.geocode(address)
-
-    lat = geocode_result[0]['geometry']['location']['lat']
-    lng = geocode_result[0]['geometry']['location']['lng']
-
-    return lat, lng
 
 def project_detail(request, slug):
     project = Project.objects.get(slug=slug)
 
     project.total_labor_spend = calculate_total_labor_spend(project)
-    project.lat, project.lng = geocode(project.address)
 
     days_worked = project.workday_set.all().order_by('date')
 
@@ -78,6 +67,37 @@ def workday_detail(request, slug):
     context = {
         'workday': workday,
         'daily_spend': daily_spend,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+def employee_detail(request,slug):
+    employee = Employee.objects.get(slug=slug)
+    total_labor_spend = 0
+
+    projects = Project.objects.all()
+
+    for project in projects:
+        print(project)
+        project.employee_labor_spend = 0
+        project.work_days = []
+        work_days = project.workday_set.all()
+        for work_day in work_days:
+            print(work_day)
+            try:
+                work_day.employee.get(id=employee.id)
+                project.work_days.append(work_day)
+                project.employee_labor_spend += employee.base_salary
+                total_labor_spend += employee.base_salary
+            except:
+                pass
+
+    template = loader.get_template('employee_detail.html')
+
+    context = {
+        'employee': employee,
+        'projects': projects,
+        'total_labor_spend': total_labor_spend,
     }
 
     return HttpResponse(template.render(context, request))
