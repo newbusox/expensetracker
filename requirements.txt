@@ -4,8 +4,10 @@ certifi==2018.11.29
 cffi==1.11.5
 chardet==3.0.4
 cryptography==2.4.2
+dj-database-url==0.5.0
 Django==2.1.5
 django-bower==5.2.0
+django-heroku==0.3.1
 django-scheduler==0.8.8
 get==2018.11.19
 github3.py==1.2.0
@@ -15,6 +17,7 @@ icalendar==4.0.3
 idna==2.8
 jwcrypto==0.6.0
 post==2018.11.20
+psycopg2==2.7.6.1
 public==2018.11.20
 pycparser==2.18
 python-dateutil==2.7.5
@@ -29,3 +32,4 @@ simplejson==3.16.0
 six==1.12.0
 uritemplate==3.0.0
 urllib3==1.24.1
+whitenoise==4.1.2
