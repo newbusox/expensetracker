@@ -13,9 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path
 
+from expenses import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index, name='index'),
+    url(r'^day/(?P<slug>[-\w\d\_]+)/$', views.workday_detail, name='workday_detail'),
+    url(r'^project/(?P<slug>[-\w\d\_]+)/$', views.project_detail, name='project_detail'),
 ]

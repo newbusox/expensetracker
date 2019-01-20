@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
+
+    <!-- Latest compiled and minified Locales -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-en-US.min.js"></script>
+
+    <script>
+        $(function () {
+            var $table = $('#table');
+            var $search = $table.data('bootstrap.table')
+                .$toolbar.find('.search input');
+            $search.attr('placeholder', 'Search');
+            $('.search').toggleClass('pull-right').toggleClass('pull-left');
+        });
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_3CNnV9Acvy2WAktrXOLvH6PU7Vt2MZo&callback=initMap">
+    </script>
+    <script>
+        function initMap() {
+            var uluru = {lat: {{ project.lat }}, lng: {{ project.lng }} };
+
+            var street_view = new google.maps.StreetViewPanorama(document.getElementById('street_view'), {
+                position: uluru,
+        });
+
+      }
+    </script>
+    <style>
+        .table-responsive{
+            overflow-y: hidden;
+        }
+    </style>
+    <style>
+        #street_view {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% if project %}
+        <div id="street_view"></div>
+    <h3>Days Worked</h3>
+        {% if days_worked %}
+        {% for day in days_worked %}
+            <div>
+                <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in day.employee.all %}{{ employee.name }}, {% endfor %})
+            </div>
+        {% endfor %}
+        {% endif %}
+
+        </div>
+    </div>
+
+{% endif %}
+</body>
