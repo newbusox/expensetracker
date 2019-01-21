@@ -6,6 +6,7 @@ from django.template import loader
 
 from expenses.models import Project, Client, Employee, WorkDay
 
+#work_days must be queryset
 def calculate_labor_spend(work_days):
     total_labor_spend = 0
 
@@ -13,6 +14,8 @@ def calculate_labor_spend(work_days):
         employees = work_day.employee.all()
         salary_adjustments = work_day.employee_salary_adjustment.all()
         for employee in employees:
+            # if there is a salary adjust in the day, see if it matches the employee we're on
+            # if so, adjust total labor spend by that amount; if not, just add in base salary
             try:
                 salary_adjustment = salary_adjustments.get(employee_id=employee.id)
                 total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
@@ -21,12 +24,12 @@ def calculate_labor_spend(work_days):
 
     return total_labor_spend
 
-
 def calculate_total_labor_spend_per_project(project):
     work_days = WorkDay.objects.filter(project=project)
     return calculate_labor_spend(work_days)
 
 def calculate_daily_labor_spend_per_project(work_day):
+    #check if queryset or object, if not queryset, get a queryset by .filter
     if isinstance(work_day, QuerySet):
         pass
     else:
