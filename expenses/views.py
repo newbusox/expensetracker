@@ -1,42 +1,44 @@
 import googlemaps
+from django.db.models import QuerySet
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.template import loader
 
 from expenses.models import Project, Client, Employee, WorkDay
 
-def calculate_total_labor_spend(project):
+def calculate_labor_spend(work_days):
     total_labor_spend = 0
-    work_days = project.workday_set.all()
-
-    work_days = WorkDay.objects.filter(project=project)
 
     for work_day in work_days:
         employees = work_day.employee.all()
+        salary_adjustments = work_day.employee_salary_adjustment.all()
         for employee in employees:
-            total_labor_spend += employee.base_salary
+            try:
+                salary_adjustment = salary_adjustments.get(employee_id=employee.id)
+                total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
+            except:
+                total_labor_spend += employee.base_salary
 
     return total_labor_spend
 
+
+def calculate_total_labor_spend_per_project(project):
+    work_days = WorkDay.objects.filter(project=project)
+    return calculate_labor_spend(work_days)
+
 def calculate_daily_labor_spend_per_project(work_day):
-    labor_spend = 0
+    if isinstance(work_day, QuerySet):
+        pass
+    else:
+        work_day = WorkDay.objects.filter(id=work_day.id)
 
-    employees = work_day.employee.all()
-    for employee in employees:
-        labor_spend += employee.base_salary
-
-    return labor_spend
-
-def calcaulte_daily_labor_spend(date):
-    labor_spend = 0
-    return labor_spend
-
+    return calculate_labor_spend(work_day)
 
 def index(request):
     projects = Project.objects.all()
 
     for project in projects:
-        project.total_labor_spend = calculate_total_labor_spend(project)
+        project.total_labor_spend = calculate_total_labor_spend_per_project(project)
 
     template = loader.get_template('index.html')
     context = {
@@ -48,7 +50,7 @@ def index(request):
 def project_detail(request, slug):
     project = Project.objects.get(slug=slug)
 
-    project.total_labor_spend = calculate_total_labor_spend(project)
+    project.total_labor_spend = calculate_total_labor_spend_per_project(project)
 
     days_worked = project.workday_set.all().order_by('date')
 
@@ -78,17 +80,21 @@ def employee_detail(request,slug):
     projects = Project.objects.all()
 
     for project in projects:
-        print(project)
         project.employee_labor_spend = 0
         project.work_days = []
         work_days = project.workday_set.all()
         for work_day in work_days:
-            print(work_day)
+            salary_adjustments = work_day.employee_salary_adjustment.all()
             try:
                 work_day.employee.get(id=employee.id)
                 project.work_days.append(work_day)
-                project.employee_labor_spend += employee.base_salary
-                total_labor_spend += employee.base_salary
+                try:
+                    salary_adjustment = salary_adjustments.get(employee_id=employee.id)
+                    project.employee_labor_spend += employee.base_salary + int(salary_adjustment.amount)
+                    total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
+                except:
+                    project.employee_labor_spend += employee.base_salary
+                    total_labor_spend += employee.base_salary
             except:
                 pass
 

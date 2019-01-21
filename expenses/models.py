@@ -62,11 +62,12 @@ class WorkDay(models.Model):
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
-        try:
-            WorkDay.objects.get(slug=self.slug)
-            self.slug = self.slug + '-' + slugify(self.project.name)
-        except:
-            pass
+        if self.pk is None:
+            try:
+                WorkDay.objects.get(slug=self.slug)
+                self.slug = self.slug + '-' + slugify(self.project.name)
+            except:
+                pass
         super(WorkDay, self).save(*args, **kwargs)
 
     def __str__(self):
