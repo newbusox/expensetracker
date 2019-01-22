@@ -39,8 +39,7 @@
     {% for employee in workday.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
     <h3>Daily Total Labor Cost</h3>
     {% if daily_spend %}{{ daily_spend }}{% endif %}
-    {% if workday.image %}
-
+    {% if workday.image.all %}
         <h3>Images</h3>
         {% for image in workday.image.all %}
             {% load static %}
