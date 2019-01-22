@@ -2,6 +2,12 @@ import googlemaps
 from django.db import models
 from django.template.defaultfilters import slugify
 
+class BaseModel(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 def geocode(address):
     # google maps client set up
@@ -17,6 +23,7 @@ def geocode(address):
 
 class Client(models.Model):
     name = models.CharField(max_length=200)
+    created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
@@ -53,12 +60,19 @@ class EmployeeSalaryAdjustment(models.Model):
     def __str__(self):
         return str(self.employee) + ' ' + str(self.amount)
 
+class Image(models.Model):
+    file = models.FileField(upload_to='attachments')
+
+    def __str__(self):
+        return str(self.file)
+
 class WorkDay(models.Model):
     description = models.TextField()
     date = models.DateField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     employee = models.ManyToManyField(Employee, blank=True)
     employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
+    image = models.ManyToManyField(Image, blank=True)
     slug = models.SlugField(unique=True)
 
     def save(self, *args, **kwargs):
@@ -72,3 +86,4 @@ class WorkDay(models.Model):
 
     def __str__(self):
         return str(self.date)
+

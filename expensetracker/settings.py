@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',
     'expenses',
 ]
 
@@ -120,20 +121,29 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+#STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
 ]
-BOWER_COMPONENTS_ROOT = '/expensetracker/components/'
 
-BOWER_INSTALLED_APPS = (
-    'jquery#1.9',
-    'underscore',
-    'jquery-ui',
-    'bootstrap',
-)
+AWS_ACCESS_KEY_ID = 'AKIAJVSNMARW35HYMP4Q'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'daily-labor-tracker-static'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_S3_REGION_NAME: 'us-east-1'
+AWS_LOCATION = 'static'
 
-django_heroku.settings(locals())
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'expenses/static'),
+]
+
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+django_heroku.settings(locals(), staticfiles=False)

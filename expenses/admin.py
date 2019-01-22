@@ -5,6 +5,7 @@ from expenses.models import *
 admin.site.register(Client)
 admin.site.register(Project)
 admin.site.register(EmployeeSalaryAdjustment)
+admin.site.register(Image)
 
 class WorkDayAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('date',)}
