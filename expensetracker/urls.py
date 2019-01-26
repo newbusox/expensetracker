@@ -22,6 +22,10 @@ from expenses import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    url(r'^date-filter/$', views.date_filter),
+    url(r'^date-filter/(?P<project>[^/]+)/$', views.date_filter),
+    url(r'^date-filter/(?P<project>[^/]+)/(?P<date_start>[^/]+)/$', views.date_filter),
+    url(r'^date-filter/(?P<project>[^/]+)/(?P<date_start>[^/]+)/(?P<date_end>[^/]+)/$', views.date_filter),
     url(r'^day/(?P<slug>[-\w\d\_]+)/$', views.workday_detail, name='workday_detail'),
     url(r'^project/(?P<slug>[-\w\d\_]+)/$', views.project_detail, name='project_detail'),
     url(r'^employee/(?P<slug>[-\w\d\_]+)/$', views.employee_detail, name='employee_detail'),

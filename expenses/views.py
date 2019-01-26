@@ -39,6 +39,7 @@ def calculate_daily_labor_spend_per_project(work_day):
 
 def index(request):
     projects = Project.objects.all()
+    work_days = WorkDay.objects.all().order_by('date')
 
     for project in projects:
         project.total_labor_spend = calculate_total_labor_spend_per_project(project)
@@ -46,6 +47,7 @@ def index(request):
     template = loader.get_template('index.html')
     context = {
             'project_list': projects,
+            'work_days': work_days,
     }
     return HttpResponse(template.render(context, request))
 
@@ -107,6 +109,30 @@ def employee_detail(request,slug):
         'employee': employee,
         'projects': projects,
         'total_labor_spend': total_labor_spend,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+def date_filter(request, project=None, date_start=None, date_end=None):
+    if project:
+        project = Project.objects.get(slug=project)
+        work_days = WorkDay.objects.filter(project=project)
+    if date_start:
+        work_days = work_days.filter(date__gt=date_start)
+    if date_end:
+        work_days = work_days.filter(date__lt=date_end)
+
+    work_days.order_by('date')
+    total_labor_spend = calculate_labor_spend(work_days)
+
+    template = loader.get_template('date_filter.html')
+
+    context = {
+        'project': project,
+        'total_labor_spend': total_labor_spend,
+        'work_days': work_days,
+        'date_start': date_start,
+        'date_end': date_end,
     }
 
     return HttpResponse(template.render(context, request))

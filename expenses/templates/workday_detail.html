@@ -25,11 +25,36 @@
     <!-- Latest compiled and minified Locales -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-en-US.min.js"></script>
 
+    <style>
+        .display {
+            width: 400px;
+        }
+    </style>
+    <script>
+        {% if workday.file.all %}
+            var media_assets = []
+            {% for file in workday.file.all %}
+                {% load static %}
+                media_assets.push("{% get_static_prefix %}{{ file.file }}");
+            {% endfor %}
+        {% endif %}
+    function display_assets () {
+        $.each(media_assets, function(i, v) {
+                if (v.indexOf('.jpg') !== -1 || v.indexOf('.jpeg') !== -1 || v.indexOf('.png') !== -1 || v.indexOf('.gif') !== -1) {
+                    $('.media').append("<div><a href=" + v + "><img class='display' src=" + v+ "></a></div>");
+                } else if (v.indexOf('.mov') !== -1 || v.indexOf('.mp4') !== -1) {
+                    $('.media').append("<div><video width='400' preload controls><source src=" + v + " type='video/mp4'></video></div>");
+                } else {
+                    $('.media').append("<div><a href=" + v + ">" + v + "</a>");
+                }
+            })
+    }
+    </script>
 
     <meta charset="UTF-8">
 
 </head>
-<body>
+<body onload="display_assets()">
 {% if workday %}
     <h1>{{ workday.date }}</h1><a href="{% url 'admin:expenses_workday_change' workday.id %}">Edit Work Day</a>
     <h2>{{ workday.project }}</h2>
@@ -39,12 +64,10 @@
     {% for employee in workday.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
     <h3>Daily Total Labor Cost</h3>
     {% if daily_spend %}{{ daily_spend }}{% endif %}
-    {% if workday.image.all %}
-        <h3>Images</h3>
-        {% for image in workday.image.all %}
-            {% load static %}
-            <img src='{% get_static_prefix %}{{image.file}}'>
-        {% endfor %}
+    {% if workday.file.all %}
+        <h3>Media</h3>
+        <div class="media">
+        </div>
     {% endif %}
 {% endif %}
 </body>

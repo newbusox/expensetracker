@@ -1,3 +1,5 @@
+import random
+
 import googlemaps
 from django.db import models
 from django.template.defaultfilters import slugify
@@ -37,7 +39,7 @@ class Project(models.Model):
     lng = models.FloatField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if self.lat == 0:
+        if self.lat is None or self.lng is None:
             self.lat, self.lng = geocode(self.address)
         super(Project, self).save(*args, **kwargs)
 
@@ -60,7 +62,7 @@ class EmployeeSalaryAdjustment(models.Model):
     def __str__(self):
         return str(self.employee) + ' ' + str(self.amount)
 
-class Image(models.Model):
+class File(models.Model):
     file = models.FileField(upload_to='attachments')
 
     def __str__(self):
@@ -72,18 +74,22 @@ class WorkDay(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     employee = models.ManyToManyField(Employee, blank=True)
     employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
-    image = models.ManyToManyField(Image, blank=True)
-    slug = models.SlugField(unique=True)
+    file = models.ManyToManyField(File, blank=True)
+    slug = models.SlugField()
 
     def save(self, *args, **kwargs):
-        if self.pk is None:
-            try:
-                WorkDay.objects.get(slug=self.slug)
+        try:
+            try_slug = WorkDay.objects.get(slug=self.slug)
+            if self.pk is None:
                 self.slug = self.slug + '-' + slugify(self.project.name)
-            except:
-                pass
+            else:
+            #hacked if someone manually changes slug of existing model to make it with random #
+                if try_slug.pk != self.pk:
+                    self.slug = self.slug + '-' + str(random.randint(1,9999)*5)
+        except:
+            pass
         super(WorkDay, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.date)
+        return str(self.date) + ' (' + str(self.project.name) + ')'
 
