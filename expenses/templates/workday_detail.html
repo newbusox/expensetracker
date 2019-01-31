@@ -37,7 +37,7 @@
                 {% load static %}
                 media_assets.push("{% get_static_prefix %}{{ file.file }}");
             {% endfor %}
-        {% endif %}
+
     function display_assets () {
         $.each(media_assets, function(i, v) {
                 if (v.indexOf('.jpg') !== -1 || v.indexOf('.jpeg') !== -1 || v.indexOf('.png') !== -1 || v.indexOf('.gif') !== -1) {
@@ -49,6 +49,7 @@
                 }
             })
     }
+    {% endif %}
     </script>
 
     <meta charset="UTF-8">

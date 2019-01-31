@@ -22,6 +22,7 @@ from expenses import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    url(r'^calendar/$', views.calendar),
     url(r'^date-filter/$', views.date_filter),
     url(r'^date-filter/(?P<project>[^/]+)/$', views.date_filter),
     url(r'^date-filter/(?P<project>[^/]+)/(?P<date_start>[^/]+)/$', views.date_filter),

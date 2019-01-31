@@ -113,6 +113,15 @@ def employee_detail(request,slug):
 
     return HttpResponse(template.render(context, request))
 
+def calendar(request):
+    template = loader.get_template('calendar.html')
+    workdays = WorkDay.objects.all()
+    context = {
+        'work_days': workdays,
+    }
+
+    return HttpResponse(template.render(context, request))
+
 def date_filter(request, project=None, date_start=None, date_end=None):
     if project:
         project = Project.objects.get(slug=project)
