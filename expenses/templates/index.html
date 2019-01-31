@@ -61,9 +61,4 @@ crossorigin="anonymous"></script>
     </table>
 </div>
 {% endif %}
-    {% for day in work_days %}
-            <div>
-                <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a>
-            </div>
-        {% endfor %}
 </body>

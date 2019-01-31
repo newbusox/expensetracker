@@ -13,8 +13,45 @@ src="https://code.jquery.com/jquery-3.1.1.min.js"
 integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
 crossorigin="anonymous"></script>
 
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+    $(function() {
+        $('#start-datepicker').datepicker();
+        $('#end-datepicker').datepicker();
+    })
+
+    $(document).ready(function() {
+        $('#query-form').submit(function(e) {
+            e.preventDefault();
+            var numberPattern = /\d+/g;
+            project = $('#project-list').val().replace(/\s+/g, '-').toLowerCase() + '/';
+            url_pattern = project
+
+            try {
+                start_date = $('#start-datepicker').val().match(numberPattern);
+                start_date = start_date[2] + '-' + start_date[0] + '-' + start_date[1] + '/';
+                url_pattern = url_pattern + start_date;
+            } catch (e) {
+
+            }
+
+            try {
+                end_date = $('#end-datepicker').val().match(numberPattern);
+                end_date = end_date[2] + '-' + end_date[0] + '-' + end_date[1];
+                url_pattern = url_pattern + end_date;
+            } catch (e) {
+
+            }
+            window.open(url_pattern, '_self');
+        })
+    })
+</script>
+
 <body>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% if total_labor_spend %}
 <h2>From: {{ date_start }} to {{ date_end }}</h2>
 <h2>Project: {{ project }}</h2>
 {% if project %}
@@ -35,4 +72,18 @@ crossorigin="anonymous"></script>
     </table>
 </div>
 {% endif %}
+{% else %}
+    <h3>Desired Project</h3>
+    <form id="query-form">
+    <select name="projects" id="project-list">
+    {% for project in all_projects %}
+        <option value="{{ project.name }}">{{ project.name }}</option>
+    {% endfor %}
+    </select>
+        <p><h3>Start Date</h3><input type="text" id="start-datepicker"></p>
+        <p><h3>End Date</h3><input type="text" id="end-datepicker"></p>
+    <button type="submit" form="query-form">Search</button>
+    </form>
+{% endif %}
 </body>
+</html>

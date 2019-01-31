@@ -123,6 +123,10 @@ def calendar(request):
     return HttpResponse(template.render(context, request))
 
 def date_filter(request, project=None, date_start=None, date_end=None):
+    work_days = None
+    total_labor_spend = None
+    all_projects = Project.objects.all()
+
     if project:
         project = Project.objects.get(slug=project)
         work_days = WorkDay.objects.filter(project=project)
@@ -130,13 +134,14 @@ def date_filter(request, project=None, date_start=None, date_end=None):
         work_days = work_days.filter(date__gt=date_start)
     if date_end:
         work_days = work_days.filter(date__lt=date_end)
-
-    work_days.order_by('date')
-    total_labor_spend = calculate_labor_spend(work_days)
+    if work_days:
+        work_days.order_by('date')
+        total_labor_spend = calculate_labor_spend(work_days)
 
     template = loader.get_template('date_filter.html')
 
     context = {
+        'all_projects': all_projects,
         'project': project,
         'total_labor_spend': total_labor_spend,
         'work_days': work_days,
