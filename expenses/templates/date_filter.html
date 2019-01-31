@@ -74,7 +74,7 @@ crossorigin="anonymous"></script>
 {% endif %}
 {% else %}
     <h3>Desired Project</h3>
-    <form id="query-form">
+    <form id="query-form" autocomplete="off">
     <select name="projects" id="project-list">
     {% for project in all_projects %}
         <option value="{{ project.name }}">{{ project.name }}</option>

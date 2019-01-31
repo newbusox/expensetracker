@@ -131,9 +131,9 @@ def date_filter(request, project=None, date_start=None, date_end=None):
         project = Project.objects.get(slug=project)
         work_days = WorkDay.objects.filter(project=project)
     if date_start:
-        work_days = work_days.filter(date__gt=date_start)
+        work_days = work_days.filter(date__gte=date_start)
     if date_end:
-        work_days = work_days.filter(date__lt=date_end)
+        work_days = work_days.filter(date__lte=date_end)
     if work_days:
         work_days.order_by('date')
         total_labor_spend = calculate_labor_spend(work_days)
