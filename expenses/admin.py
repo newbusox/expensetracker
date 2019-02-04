@@ -5,16 +5,37 @@ from expenses.models import *
 admin.site.register(Client)
 admin.site.register(EmployeeSalaryAdjustment)
 admin.site.register(File)
+admin.site.register(ConstructionDivision)
+admin.site.register(Expense)
+
+class ConstructionDivisionInline(admin.TabularInline):
+    model = ConstructionDivision
+
+class ExpenseInline(admin.TabularInline):
+    model = Expense
+
+class FileInline(admin.TabularInline):
+    model = File
+    exclude = ('expense',)
+
+class FileAdmin(admin.ModelAdmin):
+    inlines = [
+        FileInline,
+    ]
 
 class WorkDayAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('date',)}
+    inlines = [
+        FileInline,
+        ConstructionDivisionInline,
+        ExpenseInline,
+    ]
 
 class EmployeeAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 class ProjectAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
-
 
 
 admin.site.register(WorkDay, WorkDayAdmin)

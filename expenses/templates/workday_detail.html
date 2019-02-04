@@ -65,6 +65,12 @@
     {% for employee in workday.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
     <h3>Daily Total Labor Cost</h3>
     {% if daily_spend %}{{ daily_spend }}{% endif %}
+    {% if workday.constructiondivision_set %}
+    <h3>Construction Division</h3>
+        {% for construction_division in workday.constructiondivision_set.all %}
+            <p>{{ construction_division.get_division_choice_display }}</p>
+        {% endfor %}
+    {% endif %}
     {% if workday.file.all %}
         <h3>Media</h3>
         <div class="media">
