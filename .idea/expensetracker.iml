@@ -6,9 +6,6 @@
         <option name="rootFolder" value="$MODULE_DIR$" />
         <option name="settingsModule" value="expensetracker/settings.py" />
         <option name="manageScript" value="$MODULE_DIR$/manage.py" />
-        <option name="environment" value="&lt;map/&gt;" />
-        <option name="doNotUseTestRunner" value="false" />
-        <option name="trackFilePattern" value="migrations" />
       </configuration>
     </facet>
   </component>
@@ -16,7 +13,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/env" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.7 (expensetracker) (1)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7.2 virtualenv at ~/repos/expensetracker/venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
@@ -31,3 +28,4 @@
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />
   </component>
 </module>
+

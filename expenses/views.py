@@ -123,7 +123,7 @@ def calendar(request):
 
     return HttpResponse(template.render(context, request))
 
-def date_filter(request, project=None, date_start=None, date_end=None):
+def search(request, project=None, date_start=None, date_end=None):
     work_days = None
     total_labor_spend = None
     multi_work_days = None
