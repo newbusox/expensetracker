@@ -15,14 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 
 from expenses import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    url(r'^nested_admin/', include('nested_admin.urls')),
     url(r'^calendar/$', views.calendar),
     url(r'^date-filter/$', views.date_filter),
     url(r'^date-filter/(?P<project>[^/]+)/$', views.date_filter),
