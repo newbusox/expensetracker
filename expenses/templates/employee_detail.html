@@ -19,11 +19,6 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
 
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
-
-    <!-- Latest compiled and minified Locales -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-en-US.min.js"></script>
 
     <script>
         $(function () {
@@ -35,29 +30,12 @@
         });
 
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC_3CNnV9Acvy2WAktrXOLvH6PU7Vt2MZo&callback=initMap">
-    </script>
-    <script>
-        function initMap() {
-            var uluru = {lat: {{ project.lat }}, lng: {{ project.lng }} };
-
-            var street_view = new google.maps.StreetViewPanorama(document.getElementById('street_view'), {
-                position: uluru,
-        });
-
-      }
-    </script>
     <style>
         .table-responsive{
             overflow-y: hidden;
         }
     </style>
-    <style>
-        #street_view {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
+
 </head>
 <body>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}

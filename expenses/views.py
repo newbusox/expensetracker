@@ -131,7 +131,7 @@ def date_filter(request, project=None, date_start=None, date_end=None):
 
     all_projects = Project.objects.all()
 
-    if project:
+    if project and project != 'ALL':
         regexp = re.compile(r'&')
         if (regexp.search(project)):
             res = re.split('&', project)
@@ -148,12 +148,13 @@ def date_filter(request, project=None, date_start=None, date_end=None):
         else:
             project = Project.objects.get(slug=project)
             work_days = WorkDay.objects.filter(project=project).order_by('date')
-
+    elif project == 'ALL':
+        multi_projects = all_projects
+        work_days = WorkDay.objects.all().order_by('date')
 
     context = {
             'all_projects': all_projects,
     }
-
 
     if work_days:
         total_labor_spend = calculate_labor_spend(work_days)
@@ -174,8 +175,6 @@ def date_filter(request, project=None, date_start=None, date_end=None):
     if multi_projects:
         del context['project']
         context['multi_projects'] = multi_projects
-
-
 
     template = loader.get_template('date_filter.html')
 

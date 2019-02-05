@@ -1,4 +1,6 @@
 from django.contrib import admin
+import nested_admin
+
 from expenses.models import *
 
 # Register your models here.
@@ -6,29 +8,24 @@ admin.site.register(Client)
 admin.site.register(EmployeeSalaryAdjustment)
 admin.site.register(File)
 admin.site.register(ConstructionDivision)
-admin.site.register(Expense)
 
 class ConstructionDivisionInline(admin.TabularInline):
+    sortable_field_name = 'position'
     model = ConstructionDivision
 
-class ExpenseInline(admin.TabularInline):
-    model = Expense
-
-class FileInline(admin.TabularInline):
+class FileInline(admin.StackedInline):
     model = File
-    exclude = ('expense',)
 
-class FileAdmin(admin.ModelAdmin):
-    inlines = [
-        FileInline,
-    ]
+
+class ExpenseInline(admin.StackedInline):
+    model = Expense
 
 class WorkDayAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('date',)}
     inlines = [
-        FileInline,
         ConstructionDivisionInline,
         ExpenseInline,
+        FileInline,
     ]
 
 class EmployeeAdmin(admin.ModelAdmin):
@@ -41,3 +38,4 @@ class ProjectAdmin(admin.ModelAdmin):
 admin.site.register(WorkDay, WorkDayAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Project, ProjectAdmin)
+admin.site.register(Expense)

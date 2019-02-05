@@ -89,18 +89,15 @@ class WorkDay(models.Model):
 class Expense(models.Model):
     amount = models.FloatField()
     description = models.TextField(blank=True, null=True)
-
+    file = models.FileField(upload_to='attachments')
     workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.amount)
 
-
-#change from many-to-many to foreign key?
 class File(models.Model):
     file = models.FileField(upload_to='attachments')
-    workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE)
-    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, blank=True, null=True)
+    workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return str(self.file)

@@ -22,7 +22,7 @@ crossorigin="anonymous"></script>
           start: '{{  work_day.date }}',
           end: '{{  work_day.date }}',
           title: '{{ work_day.project }}',
-            url: '{%url 'workday_detail' slug=work_day.slug %}'
+          url: '{%url 'workday_detail' slug=work_day.slug %}'
         },
         {% endfor %}
     ];
