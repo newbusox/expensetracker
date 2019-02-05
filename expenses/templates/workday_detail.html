@@ -31,9 +31,9 @@
         }
     </style>
     <script>
-        {% if workday.file.all %}
+    {% if workday.file_set %}
             var media_assets = []
-            {% for file in workday.file.all %}
+            {% for file in workday.file_set.all %}
                 {% load static %}
                 media_assets.push("{% get_static_prefix %}{{ file.file }}");
             {% endfor %}
@@ -55,7 +55,7 @@
     <meta charset="UTF-8">
 
 </head>
-<body {% if workday.file.all %}onload="display_assets()"{% endif %}>
+<body {% if workday.file_set %}onload="display_assets()"{% endif %}>
 {% if workday %}
     <h1>{{ workday.date }}</h1><a href="{% url 'admin:expenses_workday_change' workday.id %}">Edit Work Day</a>
     <h2>{{ workday.project }}</h2>
@@ -71,10 +71,11 @@
             <p>{{ construction_division.get_division_choice_display }}</p>
         {% endfor %}
     {% endif %}
-    {% if workday.file.all %}
+    {% if workday.file_set.all %}
         <h3>Media</h3>
         <div class="media">
         </div>
+        {% for file in workday.file_set.all %}test{% endfor %}
     {% endif %}
 {% endif %}
 </body>
