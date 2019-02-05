@@ -157,12 +157,11 @@ def date_filter(request, project=None, date_start=None, date_end=None):
     }
 
     if work_days:
-        total_labor_spend = calculate_labor_spend(work_days)
-
         if date_start:
             work_days = work_days.filter(date__gte=date_start)
         if date_end:
             work_days = work_days.filter(date__lte=date_end)
+        total_labor_spend = calculate_labor_spend(work_days)
 
         context = {
             'project': project,
