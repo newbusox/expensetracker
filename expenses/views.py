@@ -1,5 +1,6 @@
+import re
 import googlemaps
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.template import loader
@@ -125,28 +126,57 @@ def calendar(request):
 def date_filter(request, project=None, date_start=None, date_end=None):
     work_days = None
     total_labor_spend = None
+    multi_work_days = None
+    multi_projects = None
+
     all_projects = Project.objects.all()
 
     if project:
-        project = Project.objects.get(slug=project)
-        work_days = WorkDay.objects.filter(project=project)
-    if date_start:
-        work_days = work_days.filter(date__gte=date_start)
-    if date_end:
-        work_days = work_days.filter(date__lte=date_end)
-    if work_days:
-        work_days.order_by('date')
-        total_labor_spend = calculate_labor_spend(work_days)
+        regexp = re.compile(r'&')
+        if (regexp.search(project)):
+            res = re.split('&', project)
+            multi_projects = []
+            for r in res:
+                e_project = Project.objects.get(slug=str(r))
+                multi_projects.append(e_project)
 
-    template = loader.get_template('date_filter.html')
+            work_days = [Q(project=value) for value in multi_projects]
+            query = work_days.pop()
+            for item in work_days:
+                query |= item
+            work_days = WorkDay.objects.filter(query).order_by('date')
+        else:
+            project = Project.objects.get(slug=project)
+            work_days = WorkDay.objects.filter(project=project).order_by('date')
+
 
     context = {
-        'all_projects': all_projects,
-        'project': project,
-        'total_labor_spend': total_labor_spend,
-        'work_days': work_days,
-        'date_start': date_start,
-        'date_end': date_end,
+            'all_projects': all_projects,
     }
+
+
+    if work_days:
+        total_labor_spend = calculate_labor_spend(work_days)
+
+        if date_start:
+            work_days = work_days.filter(date__gte=date_start)
+        if date_end:
+            work_days = work_days.filter(date__lte=date_end)
+
+        context = {
+            'project': project,
+            'total_labor_spend': total_labor_spend,
+            'work_days': work_days,
+            'date_start': date_start,
+            'date_end': date_end,
+        }
+
+    if multi_projects:
+        del context['project']
+        context['multi_projects'] = multi_projects
+
+
+
+    template = loader.get_template('date_filter.html')
 
     return HttpResponse(template.render(context, request))

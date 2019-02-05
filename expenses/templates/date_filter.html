@@ -26,8 +26,17 @@ crossorigin="anonymous"></script>
         $('#query-form').submit(function(e) {
             e.preventDefault();
             var numberPattern = /\d+/g;
-            project = $('#project-list').val().replace(/\s+/g, '-').toLowerCase() + '/';
-            url_pattern = project
+            url_pattern = '';
+            $('.project').each(function(index, obj) {
+                var isLastElement = index == data.length -1;
+                if(this.checked) {
+                    url_pattern += $(this).attr('value')+ '&';
+                }
+                if (isLastElement) {
+                    url_pattern = url_pattern.substring(0, url_pattern.length = 1);
+                    url_pattern += '/';
+                }
+            });
 
             try {
                 start_date = $('#start-datepicker').val().match(numberPattern);
@@ -44,7 +53,8 @@ crossorigin="anonymous"></script>
             } catch (e) {
 
             }
-            window.open('/date-filter/' + url_pattern, '_self');
+            console.log(url_pattern)
+            //window.open('/date-filter/' + url_pattern, '_self');
         })
     })
 </script>
@@ -72,12 +82,30 @@ crossorigin="anonymous"></script>
     </table>
 </div>
 {% endif %}
+{% if multi_projects %}
+<div class="bootstrap-table">
+    <table id="table" class="table table-striped table-hover" data-toggle="table" data-search="true">
+        <thead>
+            <th>Projects</th>
+            <th>Total Amount Spent (Labor)</th>
+            <th>Days Worked</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{% for project in multi_projects %}<a href="{% url 'project_detail' slug=project.slug %}">{{ project.address }}; </a>{% endfor %}</td>
+                <td>{{ total_labor_spend }}</td>
+                <td>{% for day in work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a>, {% endfor %}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
 {% else %}
-    <h3>Desired Project</h3>
+    <h3>Desired Projects</h3>
     <form id="query-form" autocomplete="off">
-    <select name="projects" id="project-list">
     {% for project in all_projects %}
-        <option value="{{ project.name }}">{{ project.name }}</option>
+        <input type="checkbox" value="{{ project.slug }}" id="{{ project.name }}" class="project">
+        <label for="{{ project.name }}">{{ project.name }}</label>
     {% endfor %}
     </select>
         <p><h3>Start Date</h3><input type="text" id="start-datepicker"></p>
