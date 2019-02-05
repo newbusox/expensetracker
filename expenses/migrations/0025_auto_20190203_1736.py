@@ -39,10 +39,4 @@ class Migration(migrations.Migration):
             name='workday',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='expenses.WorkDay'),
         ),
-        migrations.AddField(
-            model_name='file',
-            name='expense',
-            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, to='expenses.Expense'),
-            preserve_default=False,
-        ),
     ]
