@@ -38,7 +38,7 @@ def calculate_total_labor_spend_per_project(project):
 
 def calculate_daily_labor_spend_per_project(work_day):
     total_labor_spend = 0
-    #check if queryset or object, if not queryset do per work day fucntino, else do queryset function
+    #check if queryset or object, if not queryset do per work day function, else do queryset function
     if isinstance(work_day, QuerySet):
         total_labor_spend = calculate_labor_spend(work_day)
     else:
@@ -184,60 +184,105 @@ def calendar(request):
 
     return HttpResponse(template.render(context, request))
 
-def search(request, project=None, date_start=None, date_end=None):
+def search(request):
+    project = None
+    all_projects = None
     work_days = None
     total_labor_spend = None
     total_expense_spend = None
     multi_work_days = None
     multi_projects = None
+    construciton_divisions = None
 
     all_projects = Project.objects.all()
-
-    if project and project != 'ALL':
-        regexp = re.compile(r'&')
-        if (regexp.search(project)):
-            res = re.split('&', project)
-            multi_projects = []
-            for r in res:
-                e_project = Project.objects.get(slug=str(r))
-                multi_projects.append(e_project)
-
-            work_days = [Q(project=value) for value in multi_projects]
-            query = work_days.pop()
-            for item in work_days:
-                query |= item
-            work_days = WorkDay.objects.filter(query).order_by('date')
-        else:
-            project = Project.objects.get(slug=project)
-            work_days = WorkDay.objects.filter(project=project).order_by('date')
-    elif project == 'ALL':
-        multi_projects = all_projects
-        work_days = WorkDay.objects.all().order_by('date')
+    all_construction_division_choices = ConstructionDivision._meta.get_field('division_choice').choices
 
     context = {
-            'all_projects': all_projects,
+        'all_projects': all_projects,
+        'all_construction_division_choices': all_construction_division_choices,
     }
 
+    if request.GET.get('project'):
+        project_id = request.GET.get('project')
+        if project_id != 'ALL':
+            regexp = re.compile(r',')
+            if (regexp.search(project_id)):
+                res = re.split(',', project_id)
+                multi_projects = []
+                for r in res:
+                    e_project = Project.objects.get(slug=str(r))
+                    multi_projects.append(e_project)
+                work_days = [Q(project=value) for value in multi_projects]
+                query = work_days.pop()
+                for item in work_days:
+                    query |= item
+                work_days = WorkDay.objects.filter(query).order_by('date')
+                context['multi_projects'] = multi_projects
+            else:
+                project = Project.objects.get(slug=project_id)
+                work_days = WorkDay.objects.filter(project=project).order_by('date')
+                context['project'] = project
+        elif project_id == 'ALL':
+            context['multi_projects'] = all_projects
+            work_days = WorkDay.objects.all().order_by('date')
+
+    if request.GET.get('date_start'):
+        date_start = request.GET.get('date_start')
+        work_days = work_days.filter(date__gte=date_start)
+        context['date_start'] = date_start
+
+    if request.GET.get('date_end'):
+        date_end = request.GET.get('date_end')
+        work_days = work_days.filter(date__lte=date_end)
+        context['date_end'] = date_end
+
+    if request.GET.get('construction_divisions'):
+        construction_divisions = request.GET.get('construction_divisions')
+        division_choices = []
+        regexp = re.compile(r',')
+        res = re.split(',', construction_divisions)
+
+        #could be several construction choices selected, so make a list of those that were clicked
+        for r in res:
+            division_choices.append(r)
+
+        #delete last element because of the commas
+        del division_choices[-1]
+
+        #for context in display
+        verbose_division_choices = []
+        for choice in all_construction_division_choices:
+            for user_choice in division_choices:
+                if str(user_choice) == str(choice[0]):
+                    verbose_division_choices.append(choice[1])
+
+        #go through all work days already filtered
+        for work_day in work_days:
+            to_exclude = True
+            #for any individual work day, get all the construction divisions for that work day
+            construction_divisions = work_day.constructiondivision_set.all()
+            #go through each of the user selected construction choices
+            for division_choice in division_choices:
+                 #go through each of the construction_divisions for that work day
+                for construction_division in construction_divisions:
+                    # if the construction division choice for this construction division is the same as the construction_divisions we're looking at
+                    if str(construction_division.division_choice) == str(division_choice):
+                        # set flag to False, we're keeping this work_day
+                        to_exclude = False
+            if to_exclude:
+                print(work_day)
+                work_days = work_days.exclude(pk=work_day.pk)
+
+        #add chosen divisions to context for user display
+        context['construction_divisions_queried'] = verbose_division_choices
+
     if work_days:
-        if date_start:
-            work_days = work_days.filter(date__gte=date_start)
-        if date_end:
-            work_days = work_days.filter(date__lte=date_end)
+        context['work_days'] = work_days
         total_labor_spend = calculate_labor_spend(work_days)
         total_spend = total_labor_spend + calculate_expense_spend(work_days)
 
-        context = {
-            'project': project,
-            'total_labor_spend': total_labor_spend,
-            'total_spend': total_spend,
-            'work_days': work_days,
-            'date_start': date_start,
-            'date_end': date_end,
-        }
-
-    if multi_projects:
-        del context['project']
-        context['multi_projects'] = multi_projects
+        context['total_labor_spend'] = total_labor_spend
+        context['total_spend'] = total_spend
 
     template = loader.get_template('date_filter.html')
 
