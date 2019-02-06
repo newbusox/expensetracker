@@ -55,16 +55,17 @@
 <div id="street_view"></div>
 {% if project %}
     <h3>Days Worked</h3>
-        {% if days_worked %}
-        {% for day in days_worked %}
-            <div>
-                <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
-            </div>
-        {% endfor %}
-        {% endif %}
-
+    {% if days_worked %}
+    {% for day in days_worked %}
+        <div>
+            <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
         </div>
-    </div>
+    {% endfor %}
+    {% endif %}
+    <h3>Construction Breakdown</h3>
+    {% for division_type, value in construction_divisions.items %}
+        <p>{{ division_type }}: {{ value.days }} days ({% for day in value.work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> {% endfor %}) | Total Labor Spend: {{ value.labor_spend }}</p>
+    {% endfor %}
 
 {% endif %}
 </body>

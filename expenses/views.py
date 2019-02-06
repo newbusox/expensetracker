@@ -5,23 +5,30 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.template import loader
 
-from expenses.models import Project, Client, Employee, WorkDay
+from expenses.models import Project, Client, Employee, WorkDay, ConstructionDivision
+
+#work_day is not a queryset
+def calculate_labor_spend_per_work_day(work_day):
+    total_labor_spend = 0
+    employees = work_day.employee.all()
+    salary_adjustments = work_day.employee_salary_adjustment.all()
+    for employee in employees:
+        # if there is a salary adjust in the day, see if it matches the employee we're on
+        # if so, adjust total labor spend by that amount; if not, just add in base salary
+        try:
+            salary_adjustment = salary_adjustments.get(employee_id=employee.id)
+            total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
+        except:
+            total_labor_spend += employee.base_salary
+
+    return total_labor_spend
 
 #work_days must be queryset
 def calculate_labor_spend(work_days):
     total_labor_spend = 0
 
     for work_day in work_days:
-        employees = work_day.employee.all()
-        salary_adjustments = work_day.employee_salary_adjustment.all()
-        for employee in employees:
-            # if there is a salary adjust in the day, see if it matches the employee we're on
-            # if so, adjust total labor spend by that amount; if not, just add in base salary
-            try:
-                salary_adjustment = salary_adjustments.get(employee_id=employee.id)
-                total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
-            except:
-                total_labor_spend += employee.base_salary
+        total_labor_spend += calculate_labor_spend_per_work_day(work_day)
 
     return total_labor_spend
 
@@ -30,13 +37,35 @@ def calculate_total_labor_spend_per_project(project):
     return calculate_labor_spend(work_days)
 
 def calculate_daily_labor_spend_per_project(work_day):
-    #check if queryset or object, if not queryset, get a queryset by .filter
+    total_labor_spend = 0
+    #check if queryset or object, if not queryset do per work day fucntino, else do queryset function
     if isinstance(work_day, QuerySet):
-        pass
+        total_labor_spend = calculate_labor_spend(work_day)
     else:
-        work_day = WorkDay.objects.filter(id=work_day.id)
+        total_labor_spend = calculate_labor_spend_per_work_day(work_day)
 
-    return calculate_labor_spend(work_day)
+    return total_labor_spend
+
+def get_construction_divisions(work_days):
+    construction_breakdown = {}
+
+    for work_day in work_days:
+        construction_division = ConstructionDivision.objects.filter(workday=work_day)
+        for breakdown in construction_division:
+            key = breakdown.get_division_choice_display()
+            try:
+                construction_breakdown[key]
+            except:
+                construction_breakdown[key] = {}
+                construction_breakdown[key]['days'] = 0
+                construction_breakdown[key]['work_days'] = []
+                construction_breakdown[key]['labor_spend'] = 0
+            construction_breakdown[key]['days'] += 1
+            construction_breakdown[key]['work_days'].append(work_day)
+            construction_breakdown[key]['labor_spend'] += calculate_labor_spend_per_work_day(work_day)
+
+    return construction_breakdown
+
 
 def index(request):
     projects = Project.objects.all()
@@ -52,7 +81,6 @@ def index(request):
     }
     return HttpResponse(template.render(context, request))
 
-
 def project_detail(request, slug):
     project = Project.objects.get(slug=slug)
 
@@ -60,10 +88,13 @@ def project_detail(request, slug):
 
     days_worked = project.workday_set.all().order_by('date')
 
+    construction_divisions = get_construction_divisions(days_worked)
+
     template = loader.get_template('project_detail.html')
     context = {
             'project': project,
             'days_worked': days_worked,
+            'construction_divisions': construction_divisions,
     }
     return HttpResponse(template.render(context, request))
 
