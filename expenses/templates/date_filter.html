@@ -95,12 +95,14 @@ crossorigin="anonymous"></script>
         <thead>
             <th>Projects</th>
             <th>Total Amount Spent (Labor)</th>
+            <th>Total Spend (Incl. Expenses)</th>
             <th>Days Worked</th>
         </thead>
         <tbody>
             <tr>
                 <td>{% for project in multi_projects %}<a href="{% url 'project_detail' slug=project.slug %}">{{ project.address }}{% if not forloop.last %}; {% endif %}</a>{% endfor %}</td>
                 <td>{{ total_labor_spend }}</td>
+                <td>{{ total_spend }}</td>
                 <td>{% for day in work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td>
             </tr>
         </tbody>

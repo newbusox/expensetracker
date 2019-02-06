@@ -22,7 +22,6 @@ def geocode(address):
 
     return lat, lng
 
-
 class Client(models.Model):
     name = models.CharField(max_length=200)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -89,7 +88,7 @@ class WorkDay(models.Model):
 class Expense(models.Model):
     amount = models.FloatField()
     description = models.TextField(blank=True, null=True)
-    file = models.FileField(upload_to='attachments')
+    file = models.FileField(upload_to='attachments', blank=True)
     workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE)
 
     def __str__(self):
