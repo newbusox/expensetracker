@@ -194,6 +194,8 @@ def search(request):
     multi_projects = None
     construciton_divisions = None
 
+    querying_all_projects = False
+
     all_projects = Project.objects.all()
     all_construction_division_choices = ConstructionDivision._meta.get_field('division_choice').choices
 
@@ -225,6 +227,7 @@ def search(request):
         elif project_id == 'ALL':
             context['multi_projects'] = all_projects
             work_days = WorkDay.objects.all().order_by('date')
+            querying_all_projects = True
 
     if request.GET.get('date_start'):
         date_start = request.GET.get('date_start')
@@ -270,7 +273,6 @@ def search(request):
                         # set flag to False, we're keeping this work_day
                         to_exclude = False
             if to_exclude:
-                print(work_day)
                 work_days = work_days.exclude(pk=work_day.pk)
 
         #add chosen divisions to context for user display
@@ -283,6 +285,18 @@ def search(request):
 
         context['total_labor_spend'] = total_labor_spend
         context['total_spend'] = total_spend
+
+        if querying_all_projects:
+            to_exclude = False
+            for project in all_projects:
+                if not work_days.filter(project=project):
+                    to_exclude = True
+                else:
+                    pass
+                if to_exclude:
+                    all_projects = all_projects.exclude(pk=project.pk)
+
+            context['multi_projects'] = all_projects
 
     template = loader.get_template('date_filter.html')
 
