@@ -1,7 +1,5 @@
 import re
-import googlemaps
 from django.db.models import QuerySet, Q
-from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.template import loader
 
@@ -287,15 +285,14 @@ def search(request):
         context['total_spend'] = total_spend
 
         if querying_all_projects:
-            to_exclude = False
             for project in all_projects:
+                to_exclude = False
                 if not work_days.filter(project=project):
                     to_exclude = True
                 else:
                     pass
                 if to_exclude:
                     all_projects = all_projects.exclude(pk=project.pk)
-
             context['multi_projects'] = all_projects
 
     template = loader.get_template('date_filter.html')
