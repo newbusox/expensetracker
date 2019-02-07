@@ -74,6 +74,11 @@ class WorkDay(models.Model):
             try_slug = WorkDay.objects.get(slug=self.slug)
             if self.pk is None:
                 self.slug = self.slug + '-' + slugify(self.project.name)
+                try:
+                    double_try_slug = WorkDay.objects.get(slug=self.slug)
+                    self.slug = self.slug + '-' + str(random.randint(1,9999)*5)
+                except:
+                    pass
             else:
             #hacked if someone manually changes slug of existing model to make it with random, not good longterm solution... #
                 if try_slug.pk != self.pk:
