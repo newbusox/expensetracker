@@ -52,6 +52,7 @@
 </head>
 <body>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% load humanize %}
 <div id="street_view"></div>
 {% if project %}
     <h3>Days Worked</h3>
@@ -71,7 +72,7 @@
     <h3>Construction Breakdown</h3>
     {% for division_type, value in construction_divisions.items %}
         <p>{{ division_type }}: {{ value.days }} days ({% for day in value.work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> {% endfor %})
-            | Total Labor Spend: {{ value.labor_spend }} | Total Expense Spend: {{ value.expense_spend }} | Total Spend: {{ value.total_spend }}</p>
+            | Total Labor Spend: {{ value.labor_spend }} | Total Expense Spend: {{ value.expense_spend|floatformat:"2"|intcomma }} | Total Spend: {{ value.total_spend|floatformat:"2"|intcomma }}</p>
     {% endfor %}
 
 {% endif %}

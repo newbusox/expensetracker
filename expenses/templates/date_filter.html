@@ -75,6 +75,7 @@ crossorigin="anonymous"></script>
 
 <body>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% load humanize %}
 {% if total_labor_spend %}
 {% if date_start %}
 <h2>From: {{ date_start }} to {{ date_end }}</h2>
@@ -97,7 +98,7 @@ crossorigin="anonymous"></script>
                 <td>{% if multi_projects %}{% for project in multi_projects %}<a href="{% url 'project_detail' slug=project.slug %}">
                     {{ project.address }}{% if not forloop.last %}; {% endif %}</a>{% endfor %}{% else %}<a href="{% url 'project_detail' slug=project.slug %}">{{ project.address }}</a>{% endif %}</td>
                 <td>{{ total_labor_spend }}</td>
-                <td>{{ total_spend }}</td>
+                <td>{{ total_spend|floatformat:"2"|intcomma }}</td>
                 <td>{% for day in work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td>
             </tr>
         </tbody>
