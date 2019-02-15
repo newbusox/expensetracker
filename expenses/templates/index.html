@@ -40,7 +40,7 @@ crossorigin="anonymous"></script>
 
 <body>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
+{% load humanize %}
 {% if project_list %}
 <div class="bootstrap-table">
     <table id="table" class="table table-striped table-hover" data-toggle="table" data-search="true">
@@ -56,9 +56,9 @@ crossorigin="anonymous"></script>
             <tr>
                 <td><a href="{%url 'project_detail' slug=project.slug %}">{{ project.address }}</a></td>
                 <td>{{ project.client }}</td>
-                <td>{{ project.total_labor_spend }}</td>
-                <td>{{ project.total_expense_spend }}</td>
-                <td>{{ project.total_spend }}</td>
+                <td>{{ project.total_labor_spend|intcomma }}</td>
+                <td>{{ project.total_expense_spend|floatformat:"2"|intcomma }}</td>
+                <td>{{ project.total_spend|floatformat:"2"|intcomma }}</td>
             </tr>
         {% endfor %}
         </tbody>
