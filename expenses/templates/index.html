@@ -48,6 +48,8 @@ crossorigin="anonymous"></script>
             <th>Name</th>
             <th>Client</th>
             <th>Total Labor Spend</th>
+            <th>Total Expense Spend</th>
+            <th>Total Spend</th>
         </thead>
         <tbody>
         {% for project in project_list %}
@@ -55,6 +57,8 @@ crossorigin="anonymous"></script>
                 <td><a href="{%url 'project_detail' slug=project.slug %}">{{ project.address }}</a></td>
                 <td>{{ project.client }}</td>
                 <td>{{ project.total_labor_spend }}</td>
+                <td>{{ project.total_expense_spend }}</td>
+                <td>{{ project.total_spend }}</td>
             </tr>
         {% endfor %}
         </tbody>

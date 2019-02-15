@@ -63,6 +63,15 @@
     {{ workday.description|linebreaks }}
     <h3>Laborers</h3>
     {% for employee in workday.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+        {% if expenses %}
+    <h3>Expenses</h3>
+        {% for expense in expenses %}
+            {{ expense.amount }} | {{ expense.description }}
+            {% if expense.file %}
+            <p><a href="{% get_static_prefix %}{{ expense.file }}"><img class="display"src="{% get_static_prefix %}{{ expense.file }}"></a></p>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     <h3>Daily Total Labor Cost</h3>
     {% if daily_spend %}{{ daily_spend }}{% endif %}
     <h3>Daily Total Expense</h3>

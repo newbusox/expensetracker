@@ -59,6 +59,10 @@ def calculate_expense_spend(work_days):
 
     return total_expense_spend
 
+def calculate_total_expense_spend_per_project(project):
+    work_days = WorkDay.objects.filter(project=project)
+    return calculate_expense_spend(work_days)
+
 def get_construction_divisions(work_days):
     construction_breakdown = {}
 
@@ -90,6 +94,8 @@ def index(request):
 
     for project in projects:
         project.total_labor_spend = calculate_total_labor_spend_per_project(project)
+        project.total_expense_spend = calculate_total_expense_spend_per_project(project)
+        project.total_spend = project.total_labor_spend + project.total_expense_spend
 
     template = loader.get_template('index.html')
     context = {
@@ -125,6 +131,9 @@ def project_detail(request, slug):
 def workday_detail(request, slug):
     work_day = WorkDay.objects.get(slug=slug)
     template = loader.get_template('workday_detail.html')
+
+    expenses = work_day.expense_set.all()
+
     daily_spend = calculate_daily_labor_spend_per_project(work_day)
     daily_expense_spend = calculate_expense_spend_per_work_day(work_day)
     daily_total_spend = daily_spend + daily_expense_spend
@@ -134,6 +143,7 @@ def workday_detail(request, slug):
         'daily_spend': daily_spend,
         'daily_expense_spend': daily_expense_spend,
         'daily_total_spend': daily_total_spend,
+        'expenses': expenses,
     }
 
     return HttpResponse(template.render(context, request))
