@@ -237,13 +237,13 @@ def search(request):
             work_days = WorkDay.objects.all().order_by('date')
             querying_all_projects = True
 
-    if request.GET.get('date_start'):
-        date_start = request.GET.get('date_start')
+    if request.GET.get('start_date'):
+        date_start = request.GET.get('start_date')
         work_days = work_days.filter(date__gte=date_start)
         context['date_start'] = date_start
 
-    if request.GET.get('date_end'):
-        date_end = request.GET.get('date_end')
+    if request.GET.get('end_date'):
+        date_end = request.GET.get('end_date')
         work_days = work_days.filter(date__lte=date_end)
         context['date_end'] = date_end
 
