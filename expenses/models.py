@@ -22,6 +22,19 @@ def geocode(address):
 
     return lat, lng
 
+class SubContractor(models.Model):
+    name = models.CharField(max_length=200)
+    ein_number = models.CharField(max_length=200, blank=True, null=True)
+    license_number = models.CharField(max_length=200, blank=True, null=True)
+
+    main_contact = models.CharField(max_length=200, blank=True, null=True)
+    phone_number = models.CharField(max_length=200, blank=True, null=True)
+
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Client(models.Model):
     name = models.CharField(max_length=200)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -44,6 +57,16 @@ class Project(models.Model):
 
     def __str__(self):
         return self.address
+
+class SubContractorProject(models.Model):
+    description = models.TextField()
+    price = models.FloatField()
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    subcontractor = models.ForeignKey(SubContractor, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.subcontractor.name) + ' | ' + str(self.project.name) + ' | ' + str(self.description)
 
 class Employee(models.Model):
     name = models.CharField(max_length=200)
@@ -68,6 +91,8 @@ class WorkDay(models.Model):
     employee = models.ManyToManyField(Employee, blank=True)
     employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
     slug = models.SlugField()
+
+    subcontractor_project = models.ForeignKey(SubContractorProject, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         try:
@@ -158,7 +183,10 @@ class ConstructionDivision(models.Model):
         choices=DIVISION_CHOICES,
     )
 
-    workday = models.OneToOneField(WorkDay, on_delete=models.CASCADE, related_name='construction_division')
+    workday = models.OneToOneField(WorkDay, on_delete=models.CASCADE, related_name='construction_division', blank=True, null=True)
+    subcontractor = models.OneToOneField(SubContractor, on_delete=models.CASCADE, related_name='construction_division', blank=True, null=True)
 
     def __str__(self):
         return str(self.division_choice)
+
+
