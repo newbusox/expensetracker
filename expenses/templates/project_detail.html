@@ -64,15 +64,15 @@
     {% endfor %}
     {% endif %}
     <h3>Total Labor Spend</h3>
-    <p>{{ total_labor_spend }}</p>
+    <p>{{ total_labor_spend|floatformat:"2"|intcomma }}</p>
     <h3>Total Expense Spend</h3>
-    <p>{{ total_expense_spend }}</p>
+    <p>{{ total_expense_spend|floatformat:"2"|intcomma }}</p>
     <h3>Total Spend</h3>
-    <p>{{ total_spend }}</p>
+    <p>{{ total_spend|floatformat:"2"|intcomma }}</p>
     <h3>Construction Breakdown</h3>
     {% for division_type, value in construction_divisions.items %}
         <p>{{ division_type }}: {{ value.days }} days ({% for day in value.work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> {% endfor %})
-            | Total Labor Spend: {{ value.labor_spend }} | Total Expense Spend: {{ value.expense_spend|floatformat:"2"|intcomma }} | Total Spend: {{ value.total_spend|floatformat:"2"|intcomma }}</p>
+            | Total Labor Spend: {{ value.labor_spend|floatformat:"2"|intcomma }} | Total Expense Spend: {{ value.expense_spend|floatformat:"2"|intcomma }} | Total Spend: {{ value.total_spend|floatformat:"2"|intcomma }}</p>
     {% endfor %}
 
 {% endif %}
