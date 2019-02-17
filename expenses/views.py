@@ -200,7 +200,7 @@ def search(request):
     total_expense_spend = None
     multi_work_days = None
     multi_projects = None
-    construciton_divisions = None
+    construction_divisions = None
 
     querying_all_projects = False
 
@@ -271,15 +271,16 @@ def search(request):
         for work_day in work_days:
             to_exclude = True
             #for any individual work day, get all the construction divisions for that work day
-            construction_divisions = work_day.constructiondivision_set.all()
-            #go through each of the user selected construction choices
-            for division_choice in division_choices:
-                 #go through each of the construction_divisions for that work day
-                for construction_division in construction_divisions:
+            try:
+                construction_division = work_day.construction_division
+                #go through each of the user selected construction choices
+                for division_choice in division_choices:
                     # if the construction division choice for this construction division is the same as the construction_divisions we're looking at
                     if str(construction_division.division_choice) == str(division_choice):
                         # set flag to False, we're keeping this work_day
                         to_exclude = False
+            except:
+                pass
             if to_exclude:
                 work_days = work_days.exclude(pk=work_day.pk)
 

@@ -158,7 +158,7 @@ class ConstructionDivision(models.Model):
         choices=DIVISION_CHOICES,
     )
 
-    workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE)
+    workday = models.OneToOneField(WorkDay, on_delete=models.CASCADE, related_name='construction_division')
 
     def __str__(self):
         return str(self.division_choice)
