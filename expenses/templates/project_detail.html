@@ -56,10 +56,10 @@
 <div id="street_view"></div>
 {% if project %}
     <h3>Days Worked</h3>
-    {% if days_worked %}
-    {% for day in days_worked %}
+    {% if days %}
+    {% for day in days %}
         <div>
-            <a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+            <a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}</a> ({% for work_day in day.workday_set.all %}{% for employee in work_day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}, </a>{% endfor %}{% endfor %})
         </div>
     {% endfor %}
     {% endif %}
