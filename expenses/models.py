@@ -146,130 +146,39 @@ class EmployeeSalaryAdjustment(models.Model):
 
 class WorkDay(models.Model):
     description = models.TextField()
-    #to delte (the date)
-    date = models.DateField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     employee = models.ManyToManyField(Employee, blank=True)
     employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
-    slug = models.SlugField()
 
     division_choice = models.CharField(
         max_length=2,
         choices=DIVISION_CHOICES,
-        blank=True,
-        null=True,
     )
 
     day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        try:
-            try_slug = WorkDay.objects.get(slug=self.slug)
-            if self.pk is None:
-                self.slug = self.slug + '-' + slugify(self.project.name)
-                try:
-                    double_try_slug = WorkDay.objects.get(slug=self.slug)
-                    self.slug = self.slug + '-' + str(random.randint(1,9999)*5)
-                except:
-                    pass
-            else:
-            #hacked if someone manually changes slug of existing model to make it with random, not good longterm solution... #
-                if try_slug.pk != self.pk:
-                    self.slug = self.slug + '-' + str(random.randint(1,9999)*5)
-        except:
-            pass
-        super(WorkDay, self).save(*args, **kwargs)
-
     def __str__(self):
-        return str(self.date) + ' (' + str(self.project.name) + ')'
+        return str(self.day.date) + ' (' + str(self.project.name) + ')'
 
 class File(models.Model):
     file = models.FileField(upload_to='attachments')
     day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, blank=True, null=True)
 
-    # to delete
-    workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE, blank=True, null=True)
-
     def __str__(self):
         return str(self.file)
 
-#!! delete entire class
-class ConstructionDivision(models.Model):
-    PLANSPERMITS = '01'
-    DEMOLITION = '02'
-    FOUNDATION = '03'
-    ROOFGUTTERS = '04'
-    EXTERIORSIDING = '05'
-    WINDOWS = '06'
-    GARAGEDRIVEWAY = '07'
-    FRAMING = '08'
-    FINISHCARPENTRY = '09'
-    SHEETROCKINSULATION = '10'
-    INTERIORPAINT = '11'
-    FLOORING = '12'
-    KITCHEN = '13'
-    BATHROOMS = '14'
-    PLUMBINGWORK = '15'
-    ELECTRICALWORK = '16'
-    HVACWORK = '17'
-    APPLIANCES = '18'
-    YARDLANDSCAPING = '19'
-    BASEMENTFINISHES = '20'
-
-
-    DIVISION_CHOICES = (
-        (PLANSPERMITS, 'Plans/Permits'),
-        (DEMOLITION, 'Demolition'),
-        (FOUNDATION, 'Foundation'),
-        (ROOFGUTTERS, 'Roof/Gutters'),
-        (EXTERIORSIDING, 'Exterior/Siding'),
-        (WINDOWS, 'Windows'),
-        (GARAGEDRIVEWAY, 'Garage/Driveway'),
-        (FRAMING, 'Framing'),
-        (FINISHCARPENTRY, 'Finish Carpentry'),
-        (SHEETROCKINSULATION, 'Sheetrock/Insulation'),
-        (INTERIORPAINT, 'Interior Paint'),
-        (FLOORING, 'Flooring'),
-        (KITCHEN, 'Kitchen'),
-        (BATHROOMS, 'Bathrooms'),
-        (PLUMBINGWORK, 'Plumbing Work'),
-        (ELECTRICALWORK, 'Electrical Work'),
-        (HVACWORK, 'HVAC Work'),
-        (APPLIANCES, 'Appliances'),
-        (YARDLANDSCAPING, 'Yard/Landscaping'),
-        (BASEMENTFINISHES, 'Basement Finishes'),
-    )
-
-    # rename to singular?
-    division_choice = models.CharField(
-        max_length=2,
-        choices=DIVISION_CHOICES,
-    )
-
-    workday = models.OneToOneField(WorkDay, on_delete=models.CASCADE, related_name='construction_division', blank=True, null=True)
-    subcontractor = models.OneToOneField(SubContractor, on_delete=models.CASCADE, related_name='construction_division', blank=True, null=True)
-
-    def __str__(self):
-        return str(self.division_choice)
-
 class Expense(models.Model):
     amount = models.FloatField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     description = models.TextField(blank=True, null=True)
     file = models.FileField(upload_to='attachments', blank=True)
     day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, blank=True, null=True)
-    construction_division = models.ForeignKey(ConstructionDivision, on_delete=models.CASCADE, blank=True, null=True)
 
     division_choice = models.CharField(
         max_length=2,
         choices=DIVISION_CHOICES,
-        blank=True,
-        null=True,
     )
-
-    #!! delete foreign key
-    workday = models.ForeignKey(WorkDay, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return str(self.amount)

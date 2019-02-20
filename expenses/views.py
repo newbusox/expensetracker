@@ -4,7 +4,7 @@ from django.forms import model_to_dict
 from django.http import HttpResponse, Http404
 from django.template import loader
 
-from expenses.models import Project, Client, Employee, WorkDay, ConstructionDivision, Day, Expense, DIVISION_CHOICES
+from expenses.models import Project, Client, Employee, WorkDay, Day, Expense, DIVISION_CHOICES
 
 #work_day is not a queryset
 def calculate_labor_spend_per_work_day(work_day):
@@ -165,7 +165,7 @@ def project_detail(request, slug):
 
     project.total_labor_spend = calculate_total_labor_spend_per_project(project)
 
-    work_days = project.workday_set.all().order_by('date')
+    work_days = project.workday_set.all()
     total_labor_spend = calculate_labor_spend(work_days)
 
     expenses = project.expense_set.all()
@@ -360,18 +360,18 @@ def search(request):
                 query = work_days.pop()
                 for item in work_days:
                     query |= item
-                work_days = WorkDay.objects.filter(query).order_by('date')
+                work_days = WorkDay.objects.filter(query)
                 expenses = Expense.objects.filter(query)
                 context['multi_projects'] = multi_projects
             else:
                 project = Project.objects.get(slug=project_id)
-                work_days = WorkDay.objects.filter(project=project).order_by('date')
+                work_days = WorkDay.objects.filter(project=project)
                 expenses = Expense.objects.filter(project=project)
                 context['project'] = project
 
         elif project_id == 'ALL':
             context['multi_projects'] = all_projects
-            work_days = WorkDay.objects.all().order_by('date')
+            work_days = WorkDay.objects.all()
             expenses = Expense.objects.all()
             querying_all_projects = True
 
