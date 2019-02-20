@@ -57,11 +57,11 @@
 {% if project %}
     <h3>Days Worked</h3>
     {% if days %}
-    {% for day in days %}
-        <div>
-            <a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}</a> ({% for work_day in day.workday_set.all %}{% for employee in work_day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}, </a>{% endfor %}{% endfor %})
-        </div>
-    {% endfor %}
+        {% for day, details in days.items %}
+            <div>
+                <a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}</a> ({% for employee in details.employees %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</a>)
+            </div>
+        {% endfor %}
     {% endif %}
     <h3>Total Labor Spend</h3>
     <p>{{ total_labor_spend|floatformat:"2"|intcomma }}</p>
@@ -71,7 +71,7 @@
     <p>{{ total_spend|floatformat:"2"|intcomma }}</p>
     <h3>Construction Breakdown</h3>
     {% for division_type, value in construction_divisions.items %}
-        <p>{{ division_type }}: {{ value.days }} days ({% for day in value.work_days %}<a href="{%url 'workday_detail' slug=day.slug %}">{{ day.date }}</a> {% endfor %})
+        <p>{{ division_type }}: {{ value.number_of_days }} days ({% for day in value.days %}<a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}{% if not forloop.last %}, {% endif %}</a>{% endfor %})
             | Total Labor Spend: {{ value.labor_spend|floatformat:"2"|intcomma }} | Total Expense Spend: {{ value.expense_spend|floatformat:"2"|intcomma }} | Total Spend: {{ value.total_spend|floatformat:"2"|intcomma }}</p>
     {% endfor %}
 

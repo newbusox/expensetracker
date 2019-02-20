@@ -17,11 +17,11 @@ crossorigin="anonymous"></script>
 
 <script>
     const myEvents = [
-        {% for day in days %}
+        {% for day, details in days.items %}
         {
           start: '{{  day.date }}',
           end: '{{  day.date }}',
-          title: '{{ day.date }}',
+          title: '{{ day.date }} ({% for project in details.projects %}{{ project.name }}{% if not forloop.last %}; {% endif %}{% endfor %})',
           url: '{%url 'day_detail' slug=day.slug %}'
         },
         {% endfor %}

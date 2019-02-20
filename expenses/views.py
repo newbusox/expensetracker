@@ -113,12 +113,15 @@ def get_construction_divisions(expenses, work_days):
             construction_breakdown[key]
         except:
             construction_breakdown[key] = {}
-            construction_breakdown[key]['days'] = 0
+            construction_breakdown[key]['days'] = []
+            construction_breakdown[key]['number_of_days'] = 0
             construction_breakdown[key]['work_days'] = []
             construction_breakdown[key]['labor_spend'] = 0
             construction_breakdown[key]['expense_spend'] = 0
             construction_breakdown[key]['total_spend'] = 0
         construction_breakdown[key]['expense_spend'] += expense.amount
+        if expense.day not in construction_breakdown[key]['days']:
+            construction_breakdown[key]['days'].append(expense.day)
 
     for work_day in work_days:
         key = work_day.get_division_choice_display()
@@ -126,14 +129,17 @@ def get_construction_divisions(expenses, work_days):
             construction_breakdown[key]
         except:
             construction_breakdown[key] = {}
-            construction_breakdown[key]['days'] = 0
+            construction_breakdown[key]['days'] = []
+            construction_breakdown[key]['number_of_days'] = 0
             construction_breakdown[key]['work_days'] = []
             construction_breakdown[key]['labor_spend'] = 0
             construction_breakdown[key]['expense_spend'] = 0
             construction_breakdown[key]['total_spend'] = 0
-        construction_breakdown[key]['days'] += 1
+        construction_breakdown[key]['number_of_days'] += 1
         construction_breakdown[key]['work_days'].append(work_day)
         construction_breakdown[key]['labor_spend'] += calculate_labor_spend_per_work_day(work_day)
+        if work_day.day not in construction_breakdown[key]['days']:
+            construction_breakdown[key]['days'].append(work_day.day)
 
     for key, value in construction_breakdown.items():
         construction_breakdown[key]['total_spend'] = construction_breakdown[key]['labor_spend'] + construction_breakdown[key]['expense_spend']
@@ -167,13 +173,16 @@ def project_detail(request, slug):
 
     total_spend = total_labor_spend + total_expense_spend
 
-    days = []
+    days = {}
     for work_day in work_days:
-        days.append(work_day.day)
+        if work_day.day not in days:
+            days[work_day.day] = {}
+            days[work_day.day]['employees'] = []
+        for employee in work_day.employee.all():
+            days[work_day.day]['employees'].append(employee)
     for expense in expenses:
-        days.append(expense.day)
-
-    days = list(set(days))
+        if expense.day not in days:
+            days[expense.day] = {}
 
     construction_divisions = get_construction_divisions(expenses, work_days)
 
@@ -225,8 +234,9 @@ def day_detail(request, slug):
         daily_labor_spend = 0
         for work_day in work_days:
             if work_day.project == project:
+                work_day.daily_labor_spend = calculate_labor_spend_per_work_day(work_day)
                 day.projects[work_day.project]['work_days'].append(work_day)
-                day.projects[work_day.project]['total_labor_spend'] += calculate_labor_spend_per_work_day(work_day)
+                day.projects[work_day.project]['total_labor_spend'] += work_day.daily_labor_spend
                 daily_labor_spend += day.projects[work_day.project]['total_labor_spend']
         for expense in expenses:
             if expense.project == project:
@@ -258,6 +268,7 @@ def employee_detail(request,slug):
 
     for project in projects:
         project.employee_labor_spend = 0
+        project.days = []
         project.work_days = []
         work_days = project.workday_set.all()
         for work_day in work_days:
@@ -274,6 +285,8 @@ def employee_detail(request,slug):
                     total_labor_spend += employee.base_salary
             except:
                 pass
+            if work_day.day not in project.days:
+                project.days.append(work_day.day)
 
     template = loader.get_template('employee_detail.html')
 
@@ -287,7 +300,20 @@ def employee_detail(request,slug):
 
 def calendar(request):
     template = loader.get_template('calendar.html')
-    days = Day.objects.all()
+    days = {}
+
+    for day in Day.objects.all():
+        days[day] = {}
+        days[day]['projects'] = []
+        for work_day in day.workday_set.all():
+            if work_day.project not in days[day]['projects']:
+                days[day]['projects'].append(work_day.project)
+        for expense in day.expense_set.all():
+            if expense.project not in days[day]['projects']:
+                days[day]['projects'].append(expense.project)
+
+    print(days)
+
     context = {
         'days': days,
     }
@@ -300,8 +326,9 @@ def search(request):
     work_days = None
     expenses = None
     days = []
-    total_labor_spend = None
-    total_expense_spend = None
+    total_labor_spend = 0
+    total_expense_spend = 0
+    total_spend = 0
     multi_work_days = None
     multi_projects = None
     construction_divisions = []
@@ -346,9 +373,7 @@ def search(request):
             context['multi_projects'] = all_projects
             work_days = WorkDay.objects.all().order_by('date')
             expenses = Expense.objects.all()
-            #days = Day.objects.all()
             querying_all_projects = True
-
 
     if request.GET.get('start_date'):
         date_start = request.GET.get('start_date')
@@ -386,19 +411,31 @@ def search(request):
         #go through all work days already filtered
         for work_day in work_days:
             to_exclude = True
-            #for any individual work day, get all the construction divisions for that work day
+            #for any individual work day, get the construction division choice for that work day
             try:
-                construction_division = work_day.construction_division
+                construction_division = work_day.division_choice
                 #go through each of the user selected construction choices
                 for division_choice in division_choices:
                     # if the construction division choice for this construction division is the same as the construction_divisions we're looking at
-                    if str(construction_division.division_choice) == str(division_choice):
+                    if str(construction_division) == str(division_choice):
                         # set flag to False, we're keeping this work_day
                         to_exclude = False
             except:
                 pass
             if to_exclude:
                 work_days = work_days.exclude(pk=work_day.pk)
+
+        for expense in expenses:
+            to_exclude = True
+            try:
+                construction_division = expense.division_choice
+                for division_choice in division_choices:
+                    if str(construction_division) == str(division_choice):
+                        to_exclude = False
+            except:
+                pass
+            if to_exclude:
+                expenses = expenses.exclude(pk=expense.pk)
 
         #add chosen divisions to context for user display
         context['construction_divisions_queried'] = verbose_division_choices
@@ -408,8 +445,9 @@ def search(request):
         total_labor_spend = calculate_labor_spend(work_days)
         total_spend = total_labor_spend
 
-        context['total_labor_spend'] = total_labor_spend
-        context['total_spend'] = total_spend
+        for work_day in work_days:
+            if work_day.day not in days:
+                days.append(work_day.day)
 
     if expenses:
         context['expenses'] = expenses
@@ -417,14 +455,20 @@ def search(request):
 
         total_spend += total_expense_spend
 
-        context['total_labor_spend'] = total_labor_spend
-        context['total_spend'] = total_spend
+        for expense in expenses:
+            if expense.day not in days:
+                days.append(expense.day)
 
-    # NTJ this will break/is wrong
+    days.sort(key=lambda r: r.date)
+
+    context['days'] = days
+    context['total_labor_spend'] = total_labor_spend
+    context['total_spend'] = total_spend
+
     if querying_all_projects:
         for project in all_projects:
             to_exclude = False
-            if not work_days.filter(project=project):
+            if not (work_days.filter(project=project) or expenses.filter(project=project)):
                 to_exclude = True
             else:
                 pass

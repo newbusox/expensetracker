@@ -194,6 +194,7 @@ class File(models.Model):
     def __str__(self):
         return str(self.file)
 
+#!! delete entire class
 class ConstructionDivision(models.Model):
     PLANSPERMITS = '01'
     DEMOLITION = '02'
@@ -267,8 +268,8 @@ class Expense(models.Model):
         null=True,
     )
 
-    # to delete
-    workday = models.ForeignKey(WorkDay, on_delete=models.CASCADE, blank=True, null=True)
+    #!! delete foreign key
+    workday = models.ForeignKey(WorkDay, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return str(self.amount)
