@@ -158,7 +158,7 @@ class WorkDay(models.Model):
     day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return str(self.day.date) + ' (' + str(self.project.name) + ')'
+        return '(' + str(self.project.name) + ')'
 
 class File(models.Model):
     file = models.FileField(upload_to='attachments')
