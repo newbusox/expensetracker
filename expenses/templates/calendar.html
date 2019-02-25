@@ -17,12 +17,12 @@ crossorigin="anonymous"></script>
 
 <script>
     const myEvents = [
-        {% for work_day in work_days %}
+        {% for day, details in days.items %}
         {
-          start: '{{  work_day.date }}',
-          end: '{{  work_day.date }}',
-          title: '{{ work_day.project }}',
-          url: '{%url 'workday_detail' slug=work_day.slug %}'
+          start: '{{  day.date }}',
+          end: '{{  day.date }}',
+          title: '{{ day.date }} ({% for project in details.projects %}{{ project.name }}{% if not forloop.last %}; {% endif %}{% endfor %})',
+          url: '{%url 'day_detail' slug=day.slug %}'
         },
         {% endfor %}
     ];

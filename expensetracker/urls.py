@@ -27,7 +27,8 @@ urlpatterns = [
     #url(r'^search/(?P<query>[^/]+)/$', views.search),
     #url(r'^search/(?P<project>[^/]+)/(?P<date_start>[^/]+)/$', views.search),
     #url(r'^search/(?P<project>[^/]+)/(?P<date_start>[^/]+)/(?P<date_end>[^/]+)/$', views.search),
-    url(r'^day/(?P<slug>[-\w\d\_]+)/$', views.workday_detail, name='workday_detail'),
+    url(r'^day/(?P<slug>[-\w\d\_]+)/$', views.day_detail, name='day_detail'),
+    url(r'^work_day/(?P<slug>[-\w\d\_]+)/$', views.workday_detail, name='workday_detail'),
     url(r'^project/(?P<slug>[-\w\d\_]+)/$', views.project_detail, name='project_detail'),
     url(r'^employee/(?P<slug>[-\w\d\_]+)/$', views.employee_detail, name='employee_detail'),
 ]
