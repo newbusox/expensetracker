@@ -78,11 +78,9 @@
     {{ daily_expense_spend }}
     <h3>Daily Total Spend</h3>
     {{ daily_total_spend }}
-    {% if workday.constructiondivision_set %}
+    {% if workday.construction_division %}
     <h3>Construction Division</h3>
-        {% for construction_division in workday.constructiondivision_set.all %}
-            <p>{{ construction_division.get_division_choice_display }}</p>
-        {% endfor %}
+          <p>{{ workday.construction_division.get_division_choice_display }}</p>
     {% endif %}
     {% if workday.file_set.all %}
         <h3>Media</h3>

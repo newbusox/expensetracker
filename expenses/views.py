@@ -1,3 +1,5 @@
+import collections
+from collections import OrderedDict
 import re
 from django.db.models import QuerySet, Q
 from django.forms import model_to_dict
@@ -180,6 +182,8 @@ def get_construction_divisions(expenses, work_days, subcontractor_projects):
     for key, value in construction_breakdown.items():
         construction_breakdown[key]['total_spend'] = construction_breakdown[key]['labor_spend'] + construction_breakdown[key]['expense_spend'] + construction_breakdown[key]['subcontractor_spend']
 
+    (print(construction_breakdown))
+
     return construction_breakdown
 
 def index(request):
@@ -212,13 +216,14 @@ def project_detail(request, slug):
 
     total_spend = total_labor_spend + total_expense_spend + total_subcontractor_spend
 
-    days = {}
+    days = OrderedDict()
     for work_day in work_days:
         if work_day.day not in days:
             days[work_day.day] = {}
             days[work_day.day]['employees'] = []
         for employee in work_day.employee.all():
             days[work_day.day]['employees'].append(employee)
+
     for expense in expenses:
         if expense.day not in days:
             days[expense.day] = {}
@@ -228,6 +233,8 @@ def project_detail(request, slug):
         for sub_day in sub_days:
             if sub_day not in days:
                 days[sub_day] = {}
+
+    days = sorted(days.items(), key=lambda k: k[0].date)
 
     construction_divisions = get_construction_divisions(expenses, work_days, subcontractor_projects)
 
@@ -433,7 +440,6 @@ def search(request):
         expenses = expenses.filter(day__date__lte=date_end)
         context['date_end'] = date_end
 
-    # NTJ this will break/is wrong
     if request.GET.get('construction_divisions'):
         construction_divisions = request.GET.get('construction_divisions')
         division_choices = []
