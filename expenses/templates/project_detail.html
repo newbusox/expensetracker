@@ -67,12 +67,14 @@
     <p>{{ total_labor_spend|floatformat:"2"|intcomma }}</p>
     <h3>Total Expense Spend</h3>
     <p>{{ total_expense_spend|floatformat:"2"|intcomma }}</p>
+    <h3>Total Subcontractor Spend</h3>
+    <p>{{ total_subcontractor_spend|floatformat:"2"|intcomma }}</p>
     <h3>Total Spend</h3>
     <p>{{ total_spend|floatformat:"2"|intcomma }}</p>
     <h3>Construction Breakdown</h3>
     {% for division_type, value in construction_divisions.items %}
         <p>{{ division_type }}: {{ value.number_of_days }} days ({% for day in value.days %}<a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}{% if not forloop.last %}, {% endif %}</a>{% endfor %})
-            | Total Labor Spend: {{ value.labor_spend|floatformat:"2"|intcomma }} | Total Expense Spend: {{ value.expense_spend|floatformat:"2"|intcomma }} | Total Spend: {{ value.total_spend|floatformat:"2"|intcomma }}</p>
+            | Total Labor Spend: {{ value.labor_spend|floatformat:"2"|intcomma }} | Total Subcontractor Spend: {{ value.subcontractor_spend|floatformat:"2"|intcomma }} | Total Expense Spend: {{ value.expense_spend|floatformat:"2"|intcomma }} | Total Spend: {{ value.total_spend|floatformat:"2"|intcomma }}</p>
     {% endfor %}
 
 {% endif %}

@@ -128,6 +128,19 @@ class Day(models.Model):
     def __str__(self):
         return str(self.date)
 
+class SubContractorPayment(models.Model):
+    amount = models.FloatField()
+    subcontractor_project = models.ForeignKey(SubContractorProject, on_delete=models.CASCADE)
+    day = models.ForeignKey(Day, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.subcontractor_project) + ' | ' + str(self.amount) + ' | ' + str(self.day)
+
+class Income(models.Model):
+    amount = models.FloatField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    day = models.ForeignKey(Day, on_delete=models.CASCADE)
+
 class Employee(models.Model):
     name = models.CharField(max_length=200)
     base_salary = models.IntegerField(blank=True, null=True)

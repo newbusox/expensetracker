@@ -23,6 +23,12 @@ class ProjectAdmin(admin.ModelAdmin):
 class WorkDayInline(admin.StackedInline):
     model = WorkDay
 
+class SubContractorPaymentInline(admin.StackedInline):
+    model = SubContractorPayment
+
+class SubContractorAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('name',)}
+
 class SubContractorProjectInline(admin.StackedInline):
     model = SubContractorProject
 
@@ -31,12 +37,14 @@ class DayAdmin(admin.ModelAdmin):
     inlines = [
         WorkDayInline,
         ExpenseInline,
+        SubContractorPaymentInline,
         FileInline,
     ]
 
-admin.site.register(SubContractor)
 admin.site.register(WorkDay)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Expense)
 admin.site.register(Day, DayAdmin)
+admin.site.register(SubContractorPayment)
+admin.site.register(SubContractor, SubContractorAdmin)

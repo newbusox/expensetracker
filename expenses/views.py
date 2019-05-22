@@ -71,6 +71,21 @@ def calculate_daily_expense_spend_per_day(day):
 
     return calculate_expense_spend(expenses)
 
+def calculate_subcontractor_spend_per_subcontractor_project(subcontractor_project):
+    payments = subcontractor_project.subcontractorpayment_set.all()
+    total_subcontractor_payment = 0
+    for payment in payments:
+        total_subcontractor_payment += float(payment.amount)
+
+    return total_subcontractor_payment
+
+def calculate_subcontractor_spend(subcontractor_projects):
+    total_subcontractor_payment = 0
+    for subcontractor_project in subcontractor_projects:
+        total_subcontractor_payment += calculate_subcontractor_spend_per_subcontractor_project(subcontractor_project)
+
+    return total_subcontractor_payment
+
 def get_day_projects(work_days, expenses, files):
     project_list = {}
 
@@ -104,7 +119,7 @@ def get_day_projects(work_days, expenses, files):
 
     return project_list
 
-def get_construction_divisions(expenses, work_days):
+def get_construction_divisions(expenses, work_days, subcontractor_projects):
     construction_breakdown = {}
 
     for expense in expenses:
@@ -118,6 +133,7 @@ def get_construction_divisions(expenses, work_days):
             construction_breakdown[key]['work_days'] = []
             construction_breakdown[key]['labor_spend'] = 0
             construction_breakdown[key]['expense_spend'] = 0
+            construction_breakdown[key]['subcontractor_spend'] = 0
             construction_breakdown[key]['total_spend'] = 0
         construction_breakdown[key]['expense_spend'] += expense.amount
         if expense.day not in construction_breakdown[key]['days']:
@@ -134,6 +150,7 @@ def get_construction_divisions(expenses, work_days):
             construction_breakdown[key]['work_days'] = []
             construction_breakdown[key]['labor_spend'] = 0
             construction_breakdown[key]['expense_spend'] = 0
+            construction_breakdown[key]['subcontractor_spend'] = 0
             construction_breakdown[key]['total_spend'] = 0
         construction_breakdown[key]['number_of_days'] += 1
         construction_breakdown[key]['work_days'].append(work_day)
@@ -141,8 +158,27 @@ def get_construction_divisions(expenses, work_days):
         if work_day.day not in construction_breakdown[key]['days']:
             construction_breakdown[key]['days'].append(work_day.day)
 
+    for subcontractor_project in subcontractor_projects:
+        key = subcontractor_project.get_division_choice_display()
+        try:
+            construction_breakdown[key]
+        except:
+            construction_breakdown[key] = {}
+            construction_breakdown[key]['days'] = []
+            construction_breakdown[key]['number_of_days'] = 0
+            construction_breakdown[key]['work_days'] = []
+            construction_breakdown[key]['labor_spend'] = 0
+            construction_breakdown[key]['expense_spend'] = 0
+            construction_breakdown[key]['subcontractor_spend'] = 0
+            construction_breakdown[key]['total_spend'] = 0
+        construction_breakdown[key]['number_of_days'] += 1
+        construction_breakdown[key]['subcontractor_spend'] += calculate_subcontractor_spend_per_subcontractor_project(subcontractor_project)
+        for subcontractor_day in subcontractor_project.day_set.all():
+            if subcontractor_day not in construction_breakdown[key]['days']:
+                construction_breakdown[key]['days'].append(subcontractor_day)
+
     for key, value in construction_breakdown.items():
-        construction_breakdown[key]['total_spend'] = construction_breakdown[key]['labor_spend'] + construction_breakdown[key]['expense_spend']
+        construction_breakdown[key]['total_spend'] = construction_breakdown[key]['labor_spend'] + construction_breakdown[key]['expense_spend'] + construction_breakdown[key]['subcontractor_spend']
 
     return construction_breakdown
 
@@ -171,7 +207,10 @@ def project_detail(request, slug):
     expenses = project.expense_set.all()
     total_expense_spend = calculate_expense_spend(expenses)
 
-    total_spend = total_labor_spend + total_expense_spend
+    subcontractor_projects = project.subcontractorproject_set.all()
+    total_subcontractor_spend = calculate_subcontractor_spend(subcontractor_projects)
+
+    total_spend = total_labor_spend + total_expense_spend + total_subcontractor_spend
 
     days = {}
     for work_day in work_days:
@@ -184,7 +223,13 @@ def project_detail(request, slug):
         if expense.day not in days:
             days[expense.day] = {}
 
-    construction_divisions = get_construction_divisions(expenses, work_days)
+    for subcontractor_project in subcontractor_projects:
+        sub_days = subcontractor_project.day_set.all()
+        for sub_day in sub_days:
+            if sub_day not in days:
+                days[sub_day] = {}
+
+    construction_divisions = get_construction_divisions(expenses, work_days, subcontractor_projects)
 
     template = loader.get_template('project_detail.html')
     context = {
@@ -192,6 +237,7 @@ def project_detail(request, slug):
             'total_labor_spend': total_labor_spend,
             'total_expense_spend': total_expense_spend,
             'total_spend': total_spend,
+            'total_subcontractor_spend': total_subcontractor_spend,
             'days': days,
             'construction_divisions': construction_divisions,
     }
