@@ -13,14 +13,26 @@ def calculate_labor_spend_per_work_day(work_day):
     total_labor_spend = 0
     employees = work_day.employee.all()
     salary_adjustments = work_day.employee_salary_adjustment.all()
+    calculated_salaries = work_day.employee_calculated_salary.all()
     for employee in employees:
         # if there is a salary adjust in the day, see if it matches the employee we're on
         # if so, adjust total labor spend by that amount; if not, just add in base salary
-        try:
-            salary_adjustment = salary_adjustments.get(employee_id=employee.id)
-            total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
-        except:
-            total_labor_spend += employee.base_salary
+        # if the employee is a foreman, we have to do something different
+        if not employee.foreman:
+            try:
+                salary_adjustment = salary_adjustments.get(employee_id=employee.id)
+                total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
+            except:
+                total_labor_spend += employee.base_salary
+        # for a foreman, look for a calculated salary
+        else:
+            # if there is a calculated salary, add that
+            try:
+                calculated_salary = calculated_salaries.get(employee_id=employee.id)
+                total_labor_spend += calculated_salary.amount
+            # if not, add nothing. would happen if there's a foreman, but no calculated pay, or other error
+            except:
+                pass
 
     return total_labor_spend
 
