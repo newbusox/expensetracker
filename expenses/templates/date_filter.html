@@ -97,12 +97,19 @@ crossorigin="anonymous"></script>
                 <tr>
                     <td>{% if multi_projects %}{% for project in multi_projects %}<a href="{% url 'project_detail' slug=project.slug %}">
                         {{ project.address }}{% if not forloop.last %}; {% endif %}</a>{% endfor %}{% else %}<a href="{% url 'project_detail' slug=project.slug %}">{{ project.address }}</a>{% endif %}</td>
-                    <td>{{ total_labor_spend }}</td>
+                    <td>{{ total_labor_spend|floatformat:"2"|intcomma }}</td>
                     <td>{{ total_spend|floatformat:"2"|intcomma }}</td>
                     <td>{% for day in days %}<a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                 </tr>
             </tbody>
         </table>
+    </div>
+    <div>
+        {% if total_employee_spend_per_employee %}
+            {% for employee, amount in total_employee_spend_per_employee.items %}
+                <p>{{ employee }} | {{ amount|floatformat:"2"|intcomma }}</p>
+            {% endfor %}
+        {% endif %}
     </div>
 {% endif %}
 {% else %}

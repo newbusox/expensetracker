@@ -56,6 +56,7 @@
 
 </head>
 <body {% if workday.file_set %}onload="display_assets()"{% endif %}>
+{% load humanize %}
 {% if day %}
     <h1>{{ day.date }}</h1>
     <a href="{% url 'admin:expenses_day_change' day.id %}">Edit Day</a>
@@ -68,7 +69,7 @@
                 {{ work_day.description|linebreaks }}
                 <h3>Employees</h3>
                 {% for employee in work_day.employee.all %}<a href="{%url 'employee_detail' slug=employee.slug %}">{{ employee.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
-                (Labor Spend: {{ work_day.daily_labor_spend }})
+                (Labor Spend: {{ work_day.daily_labor_spend|floatformat:"2"|intcomma }})
                 <h3>Construction Division</h3>
                  {{ work_day.get_division_choice_display }}
                 {% if workday.file_set.all %}
@@ -95,14 +96,14 @@
             {% endfor %}
         {% endif %}
         <h3>Total Daily Labor Cost for Project</h3>
-        {{ project.total_labor_spend }}
+        {{ project.total_labor_spend|floatformat:"2"|intcomma }}
         <h3>Total Daily Non-Labor Expenses for Project</h3>
-        {{ project.total_expense_spend }}
+        {{ project.total_expense_spend|floatformat:"2"|intcomma }}
         <h3>Total Daily Cost for Project</h3>
-        {{ project.daily_total_spend }}
+        {{ project.daily_total_spend|floatformat:"2"|intcomma }}
         <hr>
     {% endfor %}
-    <h2>Daily Total Spend: {{ daily_total_spend }}</h2>
+    <h2>Daily Total Spend: {{ daily_total_spend|floatformat:"2"|intcomma }}</h2>
 {% endif %}
 </body>
 </html>

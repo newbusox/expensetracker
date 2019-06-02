@@ -8,6 +8,31 @@ from django.template import loader
 
 from expenses.models import Project, Client, Employee, WorkDay, Day, Expense, DIVISION_CHOICES
 
+def calculate_labor_spend_per_person_per_work_day(work_day, employee, salary_adjustments, calculated_salaries):
+    total_labor_spend = 0
+
+    # if there is a salary adjust in the day, see if it matches the employee we're on
+    # if so, adjust total labor spend by that amount; if not, just add in base salary
+    # if the employee is a foreman, we have to do something different
+
+    if not employee.foreman:
+        try:
+            salary_adjustment = salary_adjustments.get(employee_id=employee.id)
+            total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
+        except:
+            total_labor_spend += employee.base_salary
+    # for a foreman, look for a calculated salary
+    else:
+        # if there is a calculated salary, add that
+        try:
+            calculated_salary = calculated_salaries.get(employee_id=employee.id)
+            total_labor_spend += calculated_salary.amount
+        # if not, add nothing. would happen if there's a foreman, but no calculated pay, or other error
+        except:
+            pass
+
+    return total_labor_spend
+
 #work_day is not a queryset
 def calculate_labor_spend_per_work_day(work_day):
     total_labor_spend = 0
@@ -15,26 +40,38 @@ def calculate_labor_spend_per_work_day(work_day):
     salary_adjustments = work_day.employee_salary_adjustment.all()
     calculated_salaries = work_day.employee_calculated_salary.all()
     for employee in employees:
-        # if there is a salary adjust in the day, see if it matches the employee we're on
-        # if so, adjust total labor spend by that amount; if not, just add in base salary
-        # if the employee is a foreman, we have to do something different
-        if not employee.foreman:
-            try:
-                salary_adjustment = salary_adjustments.get(employee_id=employee.id)
-                total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
-            except:
-                total_labor_spend += employee.base_salary
-        # for a foreman, look for a calculated salary
-        else:
-            # if there is a calculated salary, add that
-            try:
-                calculated_salary = calculated_salaries.get(employee_id=employee.id)
-                total_labor_spend += calculated_salary.amount
-            # if not, add nothing. would happen if there's a foreman, but no calculated pay, or other error
-            except:
-                pass
+        total_labor_spend += calculate_labor_spend_per_person_per_work_day(work_day, employee, salary_adjustments, calculated_salaries)
 
     return total_labor_spend
+
+def calculate_employee_spend_for_work_day(work_day, employees):
+    employee_list =  work_day.employee.all()
+    for employee in employee_list:
+        salary_adjustments = work_day.employee_salary_adjustment.all()
+        calculated_salaries = work_day.employee_calculated_salary.all()
+        employee_labor_spend = calculate_labor_spend_per_person_per_work_day(work_day, employee, salary_adjustments, calculated_salaries)
+
+        if employee.slug in employees:
+            employees[employee.slug] += employee_labor_spend
+        else:
+            employees[employee.slug] = employee_labor_spend
+
+    return employees
+
+#work_days is a queryset
+def calculate_employee_spend_for_work_days(work_days):
+    employees = {}
+    for work_day in work_days:
+       employees = calculate_employee_spend_for_work_day(work_day, employees)
+
+    # for employee, amount in employees.items():
+    #     print(employee)
+    #     employee_detail = Employee.objects.get(slug=employee)
+    #     name = employee_detail.name
+    #     employees[name] = employees.pop(employee)
+
+    return employees
+
 
 def calculate_daily_labor_spend_per_day(day):
     work_days = day.workday_set.all().order_by('date')
@@ -508,6 +545,8 @@ def search(request):
         context['work_days'] = work_days
         total_labor_spend = calculate_labor_spend(work_days)
         total_spend = total_labor_spend
+        total_employee_spend = calculate_employee_spend_for_work_days(work_days)
+        context['total_employee_spend_per_employee'] = total_employee_spend
 
         for work_day in work_days:
             if work_day.day not in days:
