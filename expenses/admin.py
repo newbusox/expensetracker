@@ -7,6 +7,7 @@ admin.site.register(Client)
 admin.site.register(EmployeeSalaryAdjustment)
 admin.site.register(File)
 admin.site.register(SubContractorProject)
+admin.site.register(SubContractorProjectDay)
 
 class FileInline(admin.StackedInline):
     model = File
@@ -29,8 +30,8 @@ class SubContractorPaymentInline(admin.StackedInline):
 class SubContractorAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
-class SubContractorProjectInline(admin.StackedInline):
-    model = SubContractorProject
+class SubContractorProjectDay(admin.StackedInline):
+    model = SubContractorProjectDay
 
 class DayAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('date',)}
@@ -38,6 +39,7 @@ class DayAdmin(admin.ModelAdmin):
         WorkDayInline,
         ExpenseInline,
         SubContractorPaymentInline,
+        SubContractorProjectDay,
         FileInline,
     ]
 

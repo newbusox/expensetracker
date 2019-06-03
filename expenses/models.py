@@ -133,11 +133,10 @@ class SubContractorProject(models.Model):
     def __str__(self):
         return str(self.subcontractor.name) + ' | ' + str(self.project.name) + ' | ' + str(self.description)
 
+
 class Day(models.Model):
     date = models.DateField(unique=True)
     slug = models.SlugField()
-
-    subcontractor_project = models.ManyToManyField(SubContractorProject, blank=True)
 
     def __str__(self):
         return str(self.date)
@@ -149,6 +148,20 @@ class SubContractorPayment(models.Model):
 
     def __str__(self):
         return str(self.subcontractor_project) + ' | ' + str(self.amount) + ' | ' + str(self.day)
+
+class SubContractorProjectDay(models.Model):
+    description = models.TextField(blank=True, null=True)
+    subcontractor_project = models.ForeignKey(SubContractorProject, on_delete=models.CASCADE)
+
+    division_choice = models.CharField(
+        max_length=2,
+        choices=DIVISION_CHOICES,
+    )
+
+    day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return '(' + str(self.subcontractor_project.subcontractor) + ')'
 
 class Income(models.Model):
     amount = models.FloatField()

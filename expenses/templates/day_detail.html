@@ -89,6 +89,10 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
+        {% if project.total_subcontractor_spend or project.subcontractorproject_days %}
+            <h2><u>Sub Contractors</u></h2>
+            {{ project.total_subcontractor_spend }}
+        {% endif %}
         {% if project.files %}
             <h2><u>Files</u></h2>
             {% for file in project.files %}
