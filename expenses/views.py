@@ -531,3 +531,20 @@ def search(request):
     template = loader.get_template('date_filter.html')
 
     return HttpResponse(template.render(context, request))
+
+def expense_search(request):
+    context = None
+
+    if request.GET.get('expense'):
+        query_amount =request.GET.get('expense')
+        try:
+            expenses = Expense.objects.filter(amount=query_amount)
+            context = {
+                'expenses': expenses
+            }
+            print(expenses)
+        except:
+            return HttpResponse('No such expense')
+
+    template = loader.get_template('expense_search.html')
+    return HttpResponse(template.render(context, request))
