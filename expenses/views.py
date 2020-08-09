@@ -66,12 +66,10 @@ def calculate_employee_spend_for_work_days(work_days):
        employees = calculate_employee_spend_for_work_day(work_day, employees)
 
     for employee, v in employees.items():
-        print(employee)
         employee_detail = Employee.objects.get(slug=employee)
         employees[employee]['name'] = employee_detail.name
 
     return employees
-
 
 def calculate_daily_labor_spend_per_day(day):
     work_days = day.workday_set.all().order_by('date')
@@ -619,10 +617,6 @@ def search(request):
 
     days.sort(key=lambda r: r.date)
 
-    context['days'] = days
-    context['total_labor_spend'] = total_labor_spend
-    context['total_spend'] = total_spend
-
     if querying_all_projects:
         for project in all_projects:
             to_exclude = False
@@ -633,6 +627,27 @@ def search(request):
             if to_exclude:
                 all_projects = all_projects.exclude(pk=project.pk)
         context['multi_projects'] = all_projects
+
+    if work_days and multi_projects or querying_all_projects:
+        project_dict = {}
+        for project in context['multi_projects']:
+            project_dict[project.id] = {}
+            project_dict[project.id]['name'] = project.name
+            project_dict[project.id]['slug'] = project.slug
+            project_dict[project.id]['address'] = project.address
+            project_dict[project.id]['labor_spend'] = 0
+            project_dict[project.id]['days_worked'] = []
+
+        for work_day in work_days:
+            amount = calculate_labor_spend_per_work_day(work_day)
+            project_dict[work_day.project.id]['labor_spend'] += amount
+            project_dict[work_day.project.id]['days_worked'].append(work_day.day)
+
+        context['project_dict'] = project_dict
+
+    context['days'] = days
+    context['total_labor_spend'] = total_labor_spend
+    context['total_spend'] = total_spend
 
     template = loader.get_template('date_filter.html')
 
