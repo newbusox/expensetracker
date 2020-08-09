@@ -8,21 +8,68 @@ from django.template import loader
 
 from expenses.models import Project, Client, Employee, WorkDay, Day, Expense, DIVISION_CHOICES
 
-#work_day is not a queryset
-def calculate_labor_spend_per_work_day(work_day):
+def calculate_labor_spend_per_person_per_work_day(work_day, employee, salary_adjustments, calculated_salaries):
     total_labor_spend = 0
-    employees = work_day.employee.all()
-    salary_adjustments = work_day.employee_salary_adjustment.all()
-    for employee in employees:
-        # if there is a salary adjust in the day, see if it matches the employee we're on
-        # if so, adjust total labor spend by that amount; if not, just add in base salary
+
+    # if there is a salary adjust in the day, see if it matches the employee we're on
+    # if so, adjust total labor spend by that amount; if not, just add in base salary
+    # if the employee is a foreman, we have to do something different
+
+    if not employee.foreman:
         try:
             salary_adjustment = salary_adjustments.get(employee_id=employee.id)
             total_labor_spend += employee.base_salary + int(salary_adjustment.amount)
         except:
             total_labor_spend += employee.base_salary
+    # for a foreman, look for a calculated salary
+    else:
+        # if there is a calculated salary, add that
+        try:
+            calculated_salary = calculated_salaries.get(employee_id=employee.id)
+            total_labor_spend += calculated_salary.amount
+        # if not, add nothing. would happen if there's a foreman, but no calculated pay, or other error
+        except:
+            pass
 
     return total_labor_spend
+
+#work_day is not a queryset
+def calculate_labor_spend_per_work_day(work_day):
+    total_labor_spend = 0
+    employees = work_day.employee.all()
+    salary_adjustments = work_day.employee_salary_adjustment.all()
+    calculated_salaries = work_day.employee_calculated_salary.all()
+    for employee in employees:
+        total_labor_spend += calculate_labor_spend_per_person_per_work_day(work_day, employee, salary_adjustments, calculated_salaries)
+
+    return total_labor_spend
+
+def calculate_employee_spend_for_work_day(work_day, employees):
+    employee_list =  work_day.employee.all()
+    for employee in employee_list:
+        salary_adjustments = work_day.employee_salary_adjustment.all()
+        calculated_salaries = work_day.employee_calculated_salary.all()
+        employee_labor_spend = calculate_labor_spend_per_person_per_work_day(work_day, employee, salary_adjustments, calculated_salaries)
+
+        if employee.slug in employees:
+            employees[employee.slug]['pay'] += employee_labor_spend
+        else:
+            employees[employee.slug] = {}
+            employees[employee.slug]['pay'] = employee_labor_spend
+
+    return employees
+
+#work_days is a queryset
+def calculate_employee_spend_for_work_days(work_days):
+    employees = {}
+    for work_day in work_days:
+       employees = calculate_employee_spend_for_work_day(work_day, employees)
+
+    for employee, v in employees.items():
+        employee_detail = Employee.objects.get(slug=employee)
+        employees[employee]['name'] = employee_detail.name
+
+    return employees
 
 def calculate_daily_labor_spend_per_day(day):
     work_days = day.workday_set.all().order_by('date')
@@ -73,22 +120,19 @@ def calculate_daily_expense_spend_per_day(day):
 
     return calculate_expense_spend(expenses)
 
-def calculate_subcontractor_spend_per_subcontractor_project(subcontractor_project):
-    payments = subcontractor_project.subcontractorpayment_set.all()
-    total_subcontractor_payment = 0
-    for payment in payments:
-        total_subcontractor_payment += float(payment.amount)
-
-    return total_subcontractor_payment
+def calculate_subcontractor_spend_per_subcontractor_payment(subcontractor_payment):
+    return subcontractor_payment.amount
 
 def calculate_subcontractor_spend(subcontractor_projects):
     total_subcontractor_payment = 0
     for subcontractor_project in subcontractor_projects:
-        total_subcontractor_payment += calculate_subcontractor_spend_per_subcontractor_project(subcontractor_project)
+        subcontractor_payments = subcontractor_project.subcontractorpayment_set.all()
+        for subcontractor_payment in subcontractor_payments:
+            total_subcontractor_payment += subcontractor_payment.amount
 
     return total_subcontractor_payment
 
-def get_day_projects(work_days, expenses, files):
+def get_day_projects(work_days, expenses, subcontractorproject_days, subcontractor_payments, files):
     project_list = {}
 
     for work_day in work_days:
@@ -98,8 +142,10 @@ def get_day_projects(work_days, expenses, files):
             project_list[work_day.project] = {}
         project_list[work_day.project]['total_labor_spend'] = 0
         project_list[work_day.project]['total_expense_spend'] = 0
+        project_list[work_day.project]['total_subcontractor_spend'] = 0
         project_list[work_day.project]['work_days'] = []
         project_list[work_day.project]['project'] = work_day.project
+
     for expense in expenses:
         try:
             project_list[expense.project]
@@ -107,8 +153,32 @@ def get_day_projects(work_days, expenses, files):
             project_list[expense.project] = {}
         project_list[expense.project]['total_labor_spend'] = 0
         project_list[expense.project]['total_expense_spend'] = 0
+        project_list[expense.project]['total_subcontractor_spend'] = 0
         project_list[expense.project]['expenses'] = []
         project_list[expense.project]['project'] = expense.project
+
+    for subcontractorproject_day in subcontractorproject_days:
+        try:
+            project_list[subcontractorproject_day.subcontractor_project.project]
+        except:
+            project_list[subcontractorproject_day.subcontractor_project.project] = {}
+        project_list[subcontractorproject_day.subcontractor_project.project]['total_labor_spend'] = 0
+        project_list[subcontractorproject_day.subcontractor_project.project]['total_expense_spend'] = 0
+        project_list[subcontractorproject_day.subcontractor_project.project]['total_subcontractor_spend'] = 0
+        project_list[subcontractorproject_day.subcontractor_project.project]['subcontractorproject_days'] = []
+        project_list[subcontractorproject_day.subcontractor_project.project]['project'] = subcontractorproject_day.subcontractor_project.project
+
+    for subcontractor_payment in subcontractor_payments:
+        try:
+            project_list[subcontractor_payment.subcontractor_project.project]
+        except:
+            project_list[subcontractor_payment.subcontractor_project.project] = {}
+        project_list[subcontractor_payment.subcontractor_project.project]['total_labor_spend'] = 0
+        project_list[subcontractor_payment.subcontractor_project.project]['total_expense_spend'] = 0
+        project_list[subcontractor_payment.subcontractor_project.project]['total_subcontractor_spend'] = 0
+        project_list[subcontractor_payment.subcontractor_project.project]['project'] = subcontractor_payment.subcontractor_project.project
+
+
     for file in files:
         try:
             project_list[file.project]
@@ -116,6 +186,7 @@ def get_day_projects(work_days, expenses, files):
             project_list[file.project] = {}
         project_list[file.project]['total_labor_spend'] = 0
         project_list[file.project]['total_expense_spend'] = 0
+        project_list[work_day.project]['total_subcontractor_spend'] = 0
         project_list[file.project]['files'] = []
         project_list[expense.project]['project'] = expense.project
 
@@ -173,16 +244,32 @@ def get_construction_divisions(expenses, work_days, subcontractor_projects):
             construction_breakdown[key]['expense_spend'] = 0
             construction_breakdown[key]['subcontractor_spend'] = 0
             construction_breakdown[key]['total_spend'] = 0
-        construction_breakdown[key]['number_of_days'] += 1
-        construction_breakdown[key]['subcontractor_spend'] += calculate_subcontractor_spend_per_subcontractor_project(subcontractor_project)
-        for subcontractor_day in subcontractor_project.day_set.all():
-            if subcontractor_day not in construction_breakdown[key]['days']:
-                construction_breakdown[key]['days'].append(subcontractor_day)
+        for subcontractorproject_day in subcontractor_project.subcontractorprojectday_set.all():
+            new_key = subcontractorproject_day.get_division_choice_display()
+            try:
+                construction_breakdown[new_key]
+            except:
+                construction_breakdown[new_key] = {}
+                construction_breakdown[new_key]['days'] = []
+                construction_breakdown[new_key]['number_of_days'] = 0
+                construction_breakdown[new_key]['work_days'] = []
+                construction_breakdown[new_key]['labor_spend'] = 0
+                construction_breakdown[new_key]['expense_spend'] = 0
+                construction_breakdown[new_key]['subcontractor_spend'] = 0
+                construction_breakdown[new_key]['total_spend'] = 0
+            construction_breakdown[new_key]['number_of_days'] += 1
+        for subcontractor_payment in subcontractor_project.subcontractorpayment_set.all():
+            construction_breakdown[key]['subcontractor_spend'] += calculate_subcontractor_spend_per_subcontractor_payment(subcontractor_payment)
+            if subcontractor_payment.day not in construction_breakdown[key]['days']:
+                construction_breakdown[key]['days'].append(subcontractor_payment.day)
+        for subcontractorproject_day in subcontractor_project.subcontractorprojectday_set.all():
+            alt_key = subcontractorproject_day.get_division_choice_display()
+            if subcontractorproject_day.day not in construction_breakdown[alt_key]['days']:
+                construction_breakdown[alt_key]['days'].append(subcontractorproject_day.day)
 
     for key, value in construction_breakdown.items():
         construction_breakdown[key]['total_spend'] = construction_breakdown[key]['labor_spend'] + construction_breakdown[key]['expense_spend'] + construction_breakdown[key]['subcontractor_spend']
-
-    (print(construction_breakdown))
+        construction_breakdown[key]['days'].sort(key=lambda r: r.date)
 
     return construction_breakdown
 
@@ -229,16 +316,20 @@ def project_detail(request, slug):
             days[expense.day] = {}
 
     for subcontractor_project in subcontractor_projects:
-        sub_days = subcontractor_project.day_set.all()
+        sub_days = subcontractor_project.subcontractorprojectday_set.all()
         for sub_day in sub_days:
-            if sub_day not in days:
-                days[sub_day] = {}
+            if sub_day.day not in days:
+                days[sub_day.day] = {}
 
     days = sorted(days.items(), key=lambda k: k[0].date)
 
     construction_divisions = get_construction_divisions(expenses, work_days, subcontractor_projects)
 
     template = loader.get_template('project_detail.html')
+
+    # this still has a weird result for subcontractors: if there was only a payment that day, that doesn't count as a
+    # day actually worked (in the user display). (This, I think, is also true for days where there was only an "expense")
+    # this might actually be the preferred outcome--but maybe there should be a better way to display it
     context = {
             'project': project,
             'total_labor_spend': total_labor_spend,
@@ -275,13 +366,16 @@ def day_detail(request, slug):
     day = Day.objects.get(slug=slug)
     work_days = day.workday_set.all()
     expenses = day.expense_set.all()
+    subcontractorproject_days = day.subcontractorprojectday_set.all()
+    subcontractor_payments = day.subcontractorpayment_set.all()
     files = day.file_set.all()
     template = loader.get_template('day_detail.html')
     daily_labor_spend = 0
     daily_expense_spend = 0
+    daily_subcontractor_spend = 0
     daily_total_spend = 0
 
-    day.projects = get_day_projects(work_days, expenses, files)
+    day.projects = get_day_projects(work_days, expenses, subcontractorproject_days, subcontractor_payments, files)
 
     for project, value in day.projects.items():
         daily_labor_spend = 0
@@ -296,10 +390,17 @@ def day_detail(request, slug):
                 day.projects[expense.project]['expenses'].append(expense)
                 day.projects[expense.project]['total_expense_spend'] += expense.amount
                 daily_expense_spend += day.projects[expense.project]['total_expense_spend']
+        for subcontractorproject_day in subcontractorproject_days:
+            if subcontractorproject_day.subcontractor_project.project == project:
+                day.projects[subcontractorproject_day.subcontractor_project.project]['subcontractorproject_days'].append(subcontractorproject_day)
+        for subcontractor_payment in subcontractor_payments:
+            if subcontractor_payment.subcontractor_project.project == project:
+                day.projects[subcontractor_payment.subcontractor_project.project]['total_subcontractor_spend'] += subcontractor_payment.amount
+                daily_subcontractor_spend += day.projects[subcontractor_payment.subcontractor_project.project]['total_subcontractor_spend']
         for file in files:
             if file.project == project:
                 day.projects[file.project]['files'].append(file)
-        day.projects[project]['daily_total_spend'] = day.projects[project]['total_labor_spend'] + day.projects[project]['total_expense_spend']
+        day.projects[project]['daily_total_spend'] = day.projects[project]['total_labor_spend'] + day.projects[project]['total_expense_spend'] + day.projects[project]['total_subcontractor_spend']
         daily_total_spend += day.projects[project]['daily_total_spend']
 
     context = {
@@ -308,6 +409,7 @@ def day_detail(request, slug):
         'expenses': expenses,
         'daily_labor_spend': daily_labor_spend,
         'daily_expense_spend': daily_expense_spend,
+        'daily_subcontractor_spend': daily_subcontractor_spend,
         'daily_total_spend': daily_total_spend,
     }
 
@@ -496,6 +598,8 @@ def search(request):
         context['work_days'] = work_days
         total_labor_spend = calculate_labor_spend(work_days)
         total_spend = total_labor_spend
+        total_employee_spend = calculate_employee_spend_for_work_days(work_days)
+        context['total_employee_spend_per_employee'] = total_employee_spend
 
         for work_day in work_days:
             if work_day.day not in days:
@@ -513,10 +617,6 @@ def search(request):
 
     days.sort(key=lambda r: r.date)
 
-    context['days'] = days
-    context['total_labor_spend'] = total_labor_spend
-    context['total_spend'] = total_spend
-
     if querying_all_projects:
         for project in all_projects:
             to_exclude = False
@@ -527,6 +627,27 @@ def search(request):
             if to_exclude:
                 all_projects = all_projects.exclude(pk=project.pk)
         context['multi_projects'] = all_projects
+
+    if work_days and multi_projects or querying_all_projects:
+        project_dict = {}
+        for project in context['multi_projects']:
+            project_dict[project.id] = {}
+            project_dict[project.id]['name'] = project.name
+            project_dict[project.id]['slug'] = project.slug
+            project_dict[project.id]['address'] = project.address
+            project_dict[project.id]['labor_spend'] = 0
+            project_dict[project.id]['days_worked'] = []
+
+        for work_day in work_days:
+            amount = calculate_labor_spend_per_work_day(work_day)
+            project_dict[work_day.project.id]['labor_spend'] += amount
+            project_dict[work_day.project.id]['days_worked'].append(work_day.day)
+
+        context['project_dict'] = project_dict
+
+    context['days'] = days
+    context['total_labor_spend'] = total_labor_spend
+    context['total_spend'] = total_spend
 
     template = loader.get_template('date_filter.html')
 

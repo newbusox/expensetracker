@@ -48,6 +48,20 @@ DIVISION_CHOICES = (
     (BASEMENTFINISHES, 'Basement Finishes'),
 )
 
+WEEKLY = '01'
+BIWEEKLY = '02'
+SEMIMONTHLY = '03'
+MONTHLY = '04'
+DAILY = '05'
+
+PAYPERIOD_CHOICES = (
+    (WEEKLY, 'Weekly'),
+    (BIWEEKLY, 'Bi-Weekly'),
+    (SEMIMONTHLY, 'Semi-Monthly'),
+    (MONTHLY, 'Monthly'),
+    (DAILY, 'Daily'),
+)
+
 class BaseModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -119,11 +133,10 @@ class SubContractorProject(models.Model):
     def __str__(self):
         return str(self.subcontractor.name) + ' | ' + str(self.project.name) + ' | ' + str(self.description)
 
+
 class Day(models.Model):
     date = models.DateField(unique=True)
     slug = models.SlugField()
-
-    subcontractor_project = models.ManyToManyField(SubContractorProject, blank=True)
 
     def __str__(self):
         return str(self.date)
@@ -136,32 +149,9 @@ class SubContractorPayment(models.Model):
     def __str__(self):
         return str(self.subcontractor_project) + ' | ' + str(self.amount) + ' | ' + str(self.day)
 
-class Income(models.Model):
-    amount = models.FloatField()
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    day = models.ForeignKey(Day, on_delete=models.CASCADE)
-
-class Employee(models.Model):
-    name = models.CharField(max_length=200)
-    base_salary = models.IntegerField(blank=True, null=True)
-
-    slug = models.SlugField(unique=True)
-
-    def __str__(self):
-        return self.name
-
-class EmployeeSalaryAdjustment(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    amount = models.IntegerField()
-
-    def __str__(self):
-        return str(self.employee) + ' ' + str(self.amount)
-
-class WorkDay(models.Model):
-    description = models.TextField()
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    employee = models.ManyToManyField(Employee, blank=True)
-    employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
+class SubContractorProjectDay(models.Model):
+    description = models.TextField(blank=True, null=True)
+    subcontractor_project = models.ForeignKey(SubContractorProject, on_delete=models.CASCADE)
 
     division_choice = models.CharField(
         max_length=2,
@@ -170,6 +160,77 @@ class WorkDay(models.Model):
 
     day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
 
+    def __str__(self):
+        return '(' + str(self.subcontractor_project.subcontractor) + ')'
+
+class Income(models.Model):
+    amount = models.FloatField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    day = models.ForeignKey(Day, on_delete=models.CASCADE)
+
+class Employee(models.Model):
+    name = models.CharField(max_length=200)
+    base_salary = models.FloatField(blank=True, null=True)
+
+    salaried = models.BooleanField(blank=True, null=True)
+    foreman = models.BooleanField(blank=True, null=True)
+
+    pay_period = models.CharField(
+        max_length=2,
+        choices=PAYPERIOD_CHOICES,
+        blank=True,
+        null=True
+    )
+
+    daily_pay = models.FloatField(blank=True, null=True, editable=False)
+
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.daily_pay:
+            if self.pay_period == '05':
+                self.daily_pay = self.base_salary
+            elif self.pay_period == '04':
+                self.daily_pay = self.base_salary/30
+            elif self.pay_period == '03':
+                self.daily_pay = self.base_salary/15
+            elif self.pay_period == '02':
+                self.daily_pay = self.base_salary/14
+            elif self.pay_period == '01':
+                self.daily_pay = self.base_salary/7
+            print(self.daily_pay)
+        super(Employee, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name + ' (' + ('Not Salaried', 'Salaried')[self.salaried==True] +  '| ' + ('Laborer', 'Foreman')[self.foreman==True] + ')'
+
+class EmployeeSalaryAdjustment(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+
+    def __str__(self):
+        return str(self.employee) + ' ' + str(self.amount)
+
+class EmployeeCalculatedPay(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    amount = models.FloatField()
+
+    def __str__(self):
+        return str(self.employee) + ' calculated pay: ' + str(self.amount)
+
+class WorkDay(models.Model):
+    description = models.TextField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    employee = models.ManyToManyField(Employee, blank=True)
+    employee_salary_adjustment = models.ManyToManyField(EmployeeSalaryAdjustment, blank=True)
+    employee_calculated_salary = models.ManyToManyField(EmployeeCalculatedPay, blank=True, editable=False)
+
+    division_choice = models.CharField(
+        max_length=2,
+        choices=DIVISION_CHOICES,
+    )
+
+    day = models.ForeignKey(Day, on_delete=models.SET_NULL, blank=True, null=True)
     def __str__(self):
         return '(' + str(self.project.name) + ')'
 

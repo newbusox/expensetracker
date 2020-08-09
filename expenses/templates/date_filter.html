@@ -69,7 +69,7 @@ crossorigin="anonymous"></script>
             }
             console.log(url_pattern);
             window.open('/search/' + url_pattern, '_self');
-        })
+        });
     })
 </script>
 
@@ -80,29 +80,52 @@ crossorigin="anonymous"></script>
     {% if date_start %}
     <h2>From: {{ date_start }} to {{ date_end }}</h2>
     {% endif %}
-    {% if project or multi_projects %}
-        <h2>{% if multi_projects %}Projects: {% for project in multi_projects %}{{ project }}{% if not forloop.last %}; {% endif %}{% endfor %}{% else %}Project: {{ project }}{% endif %}</h2></h2>
+    {% if project or project_dict %}
+        <h2>{% if project_dict %}Projects: {% for k,v in project_dict.items %}{{ v.address }}{% if not forloop.last %}; {% endif %}{% endfor %}{% else %}Project: {{ project }}{% endif %}</h2>
         {% if construction_divisions_queried %}
         <h2>Construction Divisions</h2>{% for division in construction_divisions_queried %}{{ division }}{% if not forloop.last %}, {% endif %}{% endfor %}
-    {% endif %}
+        {% endif %}
     <div class="bootstrap-table">
         <table id="table" class="table table-striped table-hover" data-toggle="table" data-search="true">
             <thead>
                 <th>Projects</th>
                 <th>Total Amount Spent (Labor)</th>
+                <th>Total Amount Spent (Subs)</th>
                 <th>Total Spend (Incl. Expenses)</th>
                 <th>Days Worked</th>
             </thead>
             <tbody>
+                {% if project_dict %}
+                    {% for k,v in project_dict.items %}
                 <tr>
-                    <td>{% if multi_projects %}{% for project in multi_projects %}<a href="{% url 'project_detail' slug=project.slug %}">
-                        {{ project.address }}{% if not forloop.last %}; {% endif %}</a>{% endfor %}{% else %}<a href="{% url 'project_detail' slug=project.slug %}">{{ project.address }}</a>{% endif %}</td>
-                    <td>{{ total_labor_spend }}</td>
+                    <td><a href="{% url 'project_detail' slug=v.slug %}">{{ v.address }}</a></td>
+                    <td>{{ v.labor_spend|floatformat:"2"|intcomma }}</td>
+                    <td>TBA</td>
+                    <td>(Not working)</td>
+                    <td>{% for day in v.days_worked %}<a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}{% if not forloop.last %}, {% endif %}</a>{% endfor %}</td>
+                </tr>
+                    {% endfor %}
+                {% else %}
+                 <tr>
+                    <td><a href="{% url 'project_detail' slug=project.slug %}">{{ project.address }}</a></td>
+                    <td>{{ total_labor_spend|floatformat:"2"|intcomma }}</td>
+                    <td>TBA</td>
                     <td>{{ total_spend|floatformat:"2"|intcomma }}</td>
                     <td>{% for day in days %}<a href="{%url 'day_detail' slug=day.slug %}">{{ day.date }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                 </tr>
+                {% endif %}
             </tbody>
         </table>
+    <h3>Total Labor Spend: {{ total_labor_spend|floatformat:"2"|intcomma  }}</h3>
+    <hr>
+    </div>
+        <h2>Employee Pay</h2>
+    <div>
+        {% if total_employee_spend_per_employee %}
+            {% for k, v in total_employee_spend_per_employee.items %}
+                <p>{{ v.name }} | {{ v.pay|floatformat:"2"|intcomma }}</p>
+            {% endfor %}
+        {% endif %}
     </div>
 {% endif %}
 {% else %}
